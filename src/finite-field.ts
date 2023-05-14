@@ -1,4 +1,6 @@
-import { toFunctionConstructor } from "./lib.js";
+import { toFunctionConstructor } from "./lib";
+
+export { createFiniteField };
 
 function mod(a: bigint, p: bigint) {
   let x = a % p;
@@ -7,7 +9,7 @@ function mod(a: bigint, p: bigint) {
 }
 
 function add(a: bigint, b: bigint, p: bigint) {
-  return mod(a - b, p);
+  return mod(a + b, p);
 }
 
 function sub(a: bigint, b: bigint, p: bigint) {
@@ -62,39 +64,61 @@ function createFiniteField(p: bigint) {
     class Field {
       value: bigint;
 
-      p: bigint = p;
+      static p: bigint = p;
 
       constructor(x: bigint) {
         this.value = x;
       }
 
+      static get modulus() {
+        return this.p;
+      }
+
+      toBigint() {
+        return this.value;
+      }
+
+      toString() {
+        return this.value.toString();
+      }
+
+      static zero() {
+        return new Field(0n);
+      }
+
+      static one() {
+        return new Field(1n);
+      }
+
       add(x: Field | bigint): Field {
-        return new Field(
-          add(this.value, x instanceof Field ? x.value : x, this.p)
-        );
+        return new Field(add(this.value, x instanceof Field ? x.value : x, p));
       }
 
       sub(x: Field | bigint): Field {
-        return new Field(
-          sub(this.value, x instanceof Field ? x.value : x, this.p)
-        );
+        return new Field(sub(this.value, x instanceof Field ? x.value : x, p));
       }
 
       mul(x: Field | bigint): Field {
-        return new Field(
-          mul(this.value, x instanceof Field ? x.value : x, this.p)
-        );
+        return new Field(mul(this.value, x instanceof Field ? x.value : x, p));
       }
 
       pow(x: Field | bigint): Field {
-        return new Field(
-          pow(this.value, x instanceof Field ? x.value : x, this.p)
-        );
+        return new Field(pow(this.value, x instanceof Field ? x.value : x, p));
+      }
+
+      inverse() {
+        let x = inverse(this.value, p);
+        if (x === undefined) return undefined;
+        return new Field(x);
+      }
+
+      equals(a: Field | bigint) {
+        return a instanceof Field ? a.value === this.value : a === this.value;
       }
     }
   );
 }
 
 const F15 = createFiniteField(15n);
-let a = F15(5n).add(15n);
+let a = F15(5n).add(15n).mul(513n);
 console.log(a);
