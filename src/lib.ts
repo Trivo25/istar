@@ -1,4 +1,4 @@
-export { toFunctionConstructor };
+export { toFunctionConstructor, InferArgs, InferReturn };
 
 function toFunctionConstructor<Class extends new (...args: any) => any>(
   Class: Class

@@ -1,6 +1,6 @@
-import { toFunctionConstructor } from "./lib";
+import { InferReturn, toFunctionConstructor } from "./lib";
 
-export { createFiniteField, FiniteField };
+export { Field };
 
 function mod(a: bigint, p: bigint) {
   let x = a % p;
@@ -57,13 +57,13 @@ function inverse(a: bigint, p: bigint) {
 }
 
 // TODO tonelli shanks
-function safeSqrt() {}
+function sqrt() {}
 
-function fieldFactory(p: bigint) {
-  return class Field {
+const Field = toFunctionConstructor(
+  class Field {
     value: bigint;
 
-    static p: bigint = p;
+    static p: bigint = 251n;
 
     constructor(x: bigint) {
       this.value = x;
@@ -90,23 +90,31 @@ function fieldFactory(p: bigint) {
     }
 
     add(x: Field | bigint): Field {
-      return new Field(add(this.value, x instanceof Field ? x.value : x, p));
+      return new Field(
+        add(this.value, x instanceof Field ? x.value : x, Field.p)
+      );
     }
 
     sub(x: Field | bigint): Field {
-      return new Field(sub(this.value, x instanceof Field ? x.value : x, p));
+      return new Field(
+        sub(this.value, x instanceof Field ? x.value : x, Field.p)
+      );
     }
 
     mul(x: Field | bigint): Field {
-      return new Field(mul(this.value, x instanceof Field ? x.value : x, p));
+      return new Field(
+        mul(this.value, x instanceof Field ? x.value : x, Field.p)
+      );
     }
 
     pow(x: Field | bigint): Field {
-      return new Field(pow(this.value, x instanceof Field ? x.value : x, p));
+      return new Field(
+        pow(this.value, x instanceof Field ? x.value : x, Field.p)
+      );
     }
 
     inverse() {
-      let x = inverse(this.value, p);
+      let x = inverse(this.value, Field.p);
       if (x === undefined) return undefined;
       return new Field(x);
     }
@@ -114,11 +122,6 @@ function fieldFactory(p: bigint) {
     equals(a: Field | bigint) {
       return a instanceof Field ? a.value === this.value : a === this.value;
     }
-  };
-}
-
-function createFiniteField(p: bigint) {
-  return toFunctionConstructor(fieldFactory(p));
-}
-
-type FiniteField = InstanceType<ReturnType<typeof fieldFactory>>;
+  }
+);
+type Field = InferReturn<typeof Field>;

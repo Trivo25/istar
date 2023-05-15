@@ -1,12 +1,10 @@
-import { Polynomial } from "..";
-import { createFiniteField } from "..";
+import { Polynomial, Field } from "..";
 
 describe("", () => {
   it("", () => {
-    const F5 = createFiniteField(15n);
+    const F_251 = Field;
 
-    const p1 = Polynomial([F5(42n), F5(2n)]);
-    const p2 = Polynomial([F5(2n), F5(511n)]);
-    console.log(p1.add(p2));
+    const p1 = Polynomial([F_251(8n)]);
+    console.log(p1.eval(Field(12n)));
   });
 });
