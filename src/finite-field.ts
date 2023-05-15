@@ -66,7 +66,7 @@ const Field = toFunctionConstructor(
     static p: bigint = 251n;
 
     constructor(x: bigint) {
-      this.value = x;
+      this.value = mod(x, Field.p);
     }
 
     static get modulus() {
