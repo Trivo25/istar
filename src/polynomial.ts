@@ -24,7 +24,7 @@ const Polynomial = toFunctionConstructor(
 
       let coeffs = [];
       for (let i = 0; i < a.length; i++) {
-        coeffs.push(a[i]);
+        coeffs.push(a[i].add(b[i]));
       }
 
       return new Polynomial(coeffs);
