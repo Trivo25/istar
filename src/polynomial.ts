@@ -1,5 +1,5 @@
-import { Field } from "./finite-field";
-import { toFunctionConstructor } from "./lib";
+import { Field, isField } from "./finite-field";
+import { InferReturn, toFunctionConstructor } from "./lib";
 
 export { Polynomial };
 
@@ -30,7 +30,8 @@ const Polynomial = toFunctionConstructor(
       return new Polynomial(coeffs);
     }
 
-    eval(x: Field) {
+    eval(x_: Field | bigint) {
+      let x = isField(x_) ? x_ : Field(x_);
       return this.coefficients.reduce((a, b, i) => {
         let xi = x.pow(BigInt(i));
         let bxi = xi.mul(b);
@@ -39,3 +40,5 @@ const Polynomial = toFunctionConstructor(
     }
   }
 );
+
+type Polynomial = InferReturn<typeof Polynomial>;

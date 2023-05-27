@@ -1,6 +1,7 @@
 import { InferReturn, toFunctionConstructor } from "./lib";
+import { randomBytes } from "crypto";
 
-export { Field };
+export { Field, isField };
 
 function mod(a: bigint, p: bigint) {
   let x = a % p;
@@ -89,28 +90,24 @@ const Field = toFunctionConstructor(
       return new Field(1n);
     }
 
+    static random() {
+      return new Field(BigInt("0x" + randomBytes(256).toString("hex")));
+    }
+
     add(x: Field | bigint): Field {
-      return new Field(
-        add(this.value, x instanceof Field ? x.value : x, Field.p)
-      );
+      return new Field(add(this.value, isField(x) ? x.value : x, Field.p));
     }
 
     sub(x: Field | bigint): Field {
-      return new Field(
-        sub(this.value, x instanceof Field ? x.value : x, Field.p)
-      );
+      return new Field(sub(this.value, isField(x) ? x.value : x, Field.p));
     }
 
     mul(x: Field | bigint): Field {
-      return new Field(
-        mul(this.value, x instanceof Field ? x.value : x, Field.p)
-      );
+      return new Field(mul(this.value, isField(x) ? x.value : x, Field.p));
     }
 
     pow(x: Field | bigint): Field {
-      return new Field(
-        pow(this.value, x instanceof Field ? x.value : x, Field.p)
-      );
+      return new Field(pow(this.value, isField(x) ? x.value : x, Field.p));
     }
 
     inverse() {
@@ -120,8 +117,12 @@ const Field = toFunctionConstructor(
     }
 
     equals(a: Field | bigint) {
-      return a instanceof Field ? a.value === this.value : a === this.value;
+      return isField(a) ? a.value === this.value : a === this.value;
     }
   }
 );
 type Field = InferReturn<typeof Field>;
+
+function isField(x: Field | bigint): x is Field {
+  return typeof x !== "bigint";
+}
