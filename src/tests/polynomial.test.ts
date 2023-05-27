@@ -1,10 +1,18 @@
 import { Polynomial, Field } from "..";
 
-describe("", () => {
+describe("Polynomial tests", () => {
   it("", () => {
-    const F_251 = Field;
+    const F = Field;
 
-    const p1 = Polynomial([F_251(8n)]);
-    console.log(p1.eval(Field(12n)));
+    const p1 = Polynomial([F(12n), F(2n), F(1n)]);
+    console.log(p1.eval(F(2n)));
+  });
+
+  it("", () => {
+    const F = Field;
+
+    // 12x
+    const p1 = Polynomial([F(0n), F(12n)]);
+    console.log(p1.eval(F(2n)));
   });
 });

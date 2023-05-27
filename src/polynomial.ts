@@ -5,7 +5,7 @@ export { Polynomial };
 
 const Polynomial = toFunctionConstructor(
   class Polynomial {
-    // a_0 + x^1*a_1 ... x^n*a_n
+    // x^0*a_0 + x^1*a_1 ... x^n*a_n
     coefficients: Field[];
 
     constructor(coeffs: Field[]) {
