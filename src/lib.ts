@@ -1,4 +1,4 @@
-export { toFunctionConstructor, InferArgs, InferReturn };
+export { toFunctionConstructor, InferArgs, InferReturn, GenericPrimitive };
 
 function toFunctionConstructor<Class extends new (...args: any) => any>(
   Class: Class
@@ -9,6 +9,10 @@ function toFunctionConstructor<Class extends new (...args: any) => any>(
   Object.defineProperties(Constructor, Object.getOwnPropertyDescriptors(Class));
   return Constructor as any;
 }
+
+type GenericPrimitive<C> = {
+  from(x: bigint): C;
+};
 
 type InferArgs<T> = T extends new (...args: infer Args) => any ? Args : never;
 type InferReturn<T> = T extends new (...args: any) => infer Return

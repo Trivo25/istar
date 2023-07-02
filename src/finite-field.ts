@@ -1,7 +1,6 @@
-import { InferReturn, toFunctionConstructor } from "./lib";
 import { randomBytes } from "crypto";
 
-export { Field, isField };
+export { Field, isField, createField };
 
 function mod(a: bigint, p: bigint) {
   let x = a % p;
@@ -60,14 +59,14 @@ function inverse(a: bigint, p: bigint) {
 // TODO tonelli shanks
 function sqrt() {}
 
-const Field = toFunctionConstructor(
+const createField = (p: bigint) =>
   class Field {
     value: bigint;
 
-    static p: bigint = 251n;
+    static p: bigint = p;
 
-    constructor(x: bigint) {
-      this.value = mod(x, Field.p);
+    constructor(x: bigint | Field) {
+      this.value = mod(Field.isField(x) ? x.value : x, Field.p);
     }
 
     static get modulus() {
@@ -95,19 +94,27 @@ const Field = toFunctionConstructor(
     }
 
     add(x: Field | bigint): Field {
-      return new Field(add(this.value, isField(x) ? x.value : x, Field.p));
+      return new Field(
+        add(this.value, Field.isField(x) ? x.value : x, Field.p)
+      );
     }
 
     sub(x: Field | bigint): Field {
-      return new Field(sub(this.value, isField(x) ? x.value : x, Field.p));
+      return new Field(
+        sub(this.value, Field.isField(x) ? x.value : x, Field.p)
+      );
     }
 
     mul(x: Field | bigint): Field {
-      return new Field(mul(this.value, isField(x) ? x.value : x, Field.p));
+      return new Field(
+        mul(this.value, Field.isField(x) ? x.value : x, Field.p)
+      );
     }
 
     pow(x: Field | bigint): Field {
-      return new Field(pow(this.value, isField(x) ? x.value : x, Field.p));
+      return new Field(
+        pow(this.value, Field.isField(x) ? x.value : x, Field.p)
+      );
     }
 
     inverse() {
@@ -117,12 +124,20 @@ const Field = toFunctionConstructor(
     }
 
     equals(a: Field | bigint) {
-      return isField(a) ? a.value === this.value : a === this.value;
+      return Field.isField(a) ? a.value === this.value : a === this.value;
     }
-  }
-);
-type Field = InferReturn<typeof Field>;
 
-function isField(x: Field | bigint): x is Field {
-  return typeof x !== "bigint";
-}
+    rangeCheck() {
+      return this.value <= Field.p;
+    }
+
+    static from(x: bigint | Field) {
+      return new Field(x);
+    }
+
+    static isField(x: Field | bigint): x is Field {
+      return typeof x !== "bigint";
+    }
+  };
+
+type Field = InstanceType<ReturnType<typeof createField>>;

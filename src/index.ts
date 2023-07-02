@@ -1,5 +1,5 @@
 export { Polynomial } from "./polynomial";
 
-export { Field } from "./finite-field";
+export { Field, createField } from "./finite-field";
 
-export { EC, GroupAffine } from "./elliptic-curve";
+export { Group, createGroup, GroupAffine } from "./group";

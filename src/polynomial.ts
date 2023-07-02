@@ -1,10 +1,11 @@
-import { Field, isField } from "./finite-field";
-import { InferReturn, toFunctionConstructor } from "./lib";
+import { Field, createField } from "./finite-field";
 
-export { Polynomial };
+export { createPolynomial, Polynomial };
 
-const Polynomial = toFunctionConstructor(
-  class Polynomial {
+function createPolynomial(p: bigint) {
+  class FieldClass extends createField(p) {}
+
+  return class Polynomial {
     // x^0*a_0 + x^1*a_1 ... x^n*a_n
     coefficients: Field[];
 
@@ -31,14 +32,14 @@ const Polynomial = toFunctionConstructor(
     }
 
     eval(x_: Field | bigint) {
-      let x = isField(x_) ? x_ : Field(x_);
+      let x = FieldClass.isField(x_) ? x_ : FieldClass.from(x_);
       return this.coefficients.reduce((a, b, i) => {
         let xi = x.pow(BigInt(i));
         let bxi = xi.mul(b);
         return bxi.add(a);
-      }, Field(0n));
+      }, FieldClass.from(0n));
     }
-  }
-);
+  };
+}
 
-type Polynomial = InferReturn<typeof Polynomial>;
+type Polynomial = InstanceType<ReturnType<typeof createPolynomial>>;
