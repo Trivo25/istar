@@ -33,16 +33,22 @@ function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
       let x = FieldClass_.isField(x_) ? x_ : FieldClass_.from(x_);
       let y = FieldClass_.isField(y_) ? y_ : FieldClass_.from(y_);
 
-      let isPoint = y
-        .mul(2n)
-        .equals(x.mul(3n).add(x.add(EllipticCurve.a)).add(EllipticCurve.b));
-
-      //if (!isPoint) throw new Error("Not a point");
+      if (!EllipticCurve.isPoint({ x, y }))
+        throw new Error(`(${x}, ${y}) is not a valid point on this curve.`);
 
       this.p = {
         x,
         y,
       };
+    }
+
+    static isPoint({ x: x_, y: y_ }: { x: Field | bigint; y: Field | bigint }) {
+      let x = FieldClass_.isField(x_) ? x_ : FieldClass_.from(x_);
+      let y = FieldClass_.isField(y_) ? y_ : FieldClass_.from(y_);
+
+      return y
+        .mul(2n)
+        .equals(x.mul(3n).add(x.add(EllipticCurve.a)).add(EllipticCurve.b));
     }
 
     add(a: EllipticCurve | GroupAffine) {
