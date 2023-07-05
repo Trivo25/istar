@@ -15,6 +15,11 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
       return new Polynomial(coeffs);
     }
 
+    static x() {
+      // 0 + 1x
+      return new Polynomial([FieldClass.from(0n), FieldClass.from(1n)]);
+    }
+
     add(p: Polynomial) {
       let a, b;
       if (p.coefficients.length >= this.coefficients.length) {
@@ -40,6 +45,22 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
         let bxi = xi.mul(b);
         return bxi.add(a);
       }, FieldClass.from(0n));
+    }
+
+    equals(p: Polynomial) {
+      let thisLength = this.coefficients.length;
+      let pLength = p.coefficients.length;
+
+      if (pLength !== thisLength) return false;
+
+      for (let i = 0; i < thisLength; i++) {
+        if (!this.coefficients[i].equals(p.coefficients[i])) return false;
+      }
+      return true;
+    }
+
+    degree() {
+      return this.coefficients.length - 1;
     }
   };
 }
