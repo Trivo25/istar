@@ -1,13 +1,14 @@
-import { Polynomial, Field } from "..";
+import { Polynomial, createField, createPolynomial } from "..";
 
 describe("Polynomial tests", () => {
-  const F = Field;
+  class F extends createField(251n) {}
+  let P_251 = createPolynomial(F);
 
   describe("12 + 2x + x^2", () => {
     let p: Polynomial;
 
     beforeAll(() => {
-      p = Polynomial([F(12n), F(2n), F(1n)]);
+      p = P_251.from([new F(12n), new F(2n), new F(1n)]);
     });
 
     it("should evaluate correctly", () => {
@@ -27,7 +28,7 @@ describe("Polynomial tests", () => {
     let p: Polynomial;
 
     beforeAll(() => {
-      p = Polynomial([F(0n), F(1n)]);
+      p = P_251.from([F.from(0n), F.from(1n)]);
     });
 
     it("should evaluate correctly", () => {

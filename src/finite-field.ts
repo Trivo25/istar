@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
 
-export { Field, isField, createField };
+export { Field, FieldClass, createField };
 
 function mod(a: bigint, p: bigint) {
   let x = a % p;
@@ -127,7 +127,7 @@ const createField = (p: bigint) =>
       return Field.isField(a) ? a.value === this.value : a === this.value;
     }
 
-    rangeCheck() {
+    inRange() {
       return this.value <= Field.p;
     }
 
@@ -141,3 +141,4 @@ const createField = (p: bigint) =>
   };
 
 type Field = InstanceType<ReturnType<typeof createField>>;
+type FieldClass = ReturnType<typeof createField>;

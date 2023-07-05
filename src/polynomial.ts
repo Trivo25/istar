@@ -2,15 +2,17 @@ import { Field, createField } from "./finite-field";
 
 export { createPolynomial, Polynomial };
 
-function createPolynomial(p: bigint) {
-  class FieldClass extends createField(p) {}
-
+function createPolynomial(FieldClass: ReturnType<typeof createField>) {
   return class Polynomial {
     // x^0*a_0 + x^1*a_1 ... x^n*a_n
     coefficients: Field[];
 
     constructor(coeffs: Field[]) {
       this.coefficients = coeffs;
+    }
+
+    static from(coeffs: Field[]) {
+      return new Polynomial(coeffs);
     }
 
     add(p: Polynomial) {
@@ -41,5 +43,4 @@ function createPolynomial(p: bigint) {
     }
   };
 }
-
 type Polynomial = InstanceType<ReturnType<typeof createPolynomial>>;
