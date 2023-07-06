@@ -8,6 +8,12 @@ function mod(a: bigint, p: bigint) {
   return x;
 }
 
+function div(a: bigint, b: bigint, p: bigint) {
+  let ainv = inverse(a, p);
+  if (ainv === undefined) return;
+  return mod(b * ainv, p);
+}
+
 function add(a: bigint, b: bigint, p: bigint) {
   return mod(a + b, p);
 }
@@ -114,6 +120,12 @@ const createField = (p: bigint) =>
     pow(x: Field | bigint): Field {
       return new Field(
         pow(this.value, Field.isField(x) ? x.value : x, Field.p)
+      );
+    }
+
+    div(x: Field | bigint) {
+      return new Field(
+        div(this.value, Field.isField(x) ? x.value : x, Field.p)
       );
     }
 
