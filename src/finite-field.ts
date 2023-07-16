@@ -10,7 +10,7 @@ function mod(a: bigint, p: bigint) {
 
 function div(a: bigint, b: bigint, p: bigint) {
   let ainv = inverse(a, p);
-  if (ainv === undefined) return;
+  if (ainv === undefined) return; // we assume p is prime, therefor every element should be invertible gcd(a, p) = 1
   return mod(b * ainv, p);
 }
 
@@ -125,13 +125,13 @@ const createField = (p: bigint) =>
 
     div(x: Field | bigint) {
       return new Field(
-        div(this.value, Field.isField(x) ? x.value : x, Field.p)
+        div(this.value, Field.isField(x) ? x.value : x, Field.p)!
       );
     }
 
     inverse() {
-      let x = inverse(this.value, Field.p);
-      if (x === undefined) return undefined;
+      let x = inverse(this.value, Field.p)!;
+      //if (x === undefined) return undefined;
       return new Field(x);
     }
 

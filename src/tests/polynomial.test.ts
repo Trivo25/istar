@@ -1,4 +1,10 @@
-import { Polynomial, createField, createPolynomial } from "..";
+import {
+  Lagrange,
+  Polynomial,
+  createField,
+  createLagrange,
+  createPolynomial,
+} from "..";
 
 describe("Polynomial tests", () => {
   class F extends createField(251n) {}
@@ -70,6 +76,48 @@ describe("Polynomial tests", () => {
           .add(P_251.x())
           .equals(P_251.from([F.from(0n), F.from(2n)]))
       ).toEqual(true);
+    });
+  });
+});
+
+describe("Lagrange interpolation tests", () => {
+  describe("", () => {
+    class F extends createField(251n) {}
+    let Lagrange = createLagrange(F);
+
+    let L: Lagrange;
+
+    beforeAll(() => {
+      L = Lagrange.fromPoints([
+        {
+          x: F.from(5n),
+          y: F.from(3n),
+        },
+        {
+          x: F.from(2n),
+          y: F.from(8n),
+        },
+        {
+          x: F.from(3n),
+          y: F.from(4n),
+        },
+      ]);
+    });
+
+    it("Evaluation at (2, 8)", () => {
+      expect(L.eval(2n).equals(8n)).toBeTruthy();
+    });
+
+    it("Evaluation at (5, 3)", () => {
+      expect(L.eval(5n).equals(3n)).toBeTruthy();
+    });
+
+    it("Evaluation at (3, 4)", () => {
+      expect(L.eval(3n).equals(4n)).toBeTruthy();
+    });
+
+    it("Evaluation at L(2) = 8", () => {
+      expect(L.eval(2n).equals(8n)).toBeTruthy();
     });
   });
 });

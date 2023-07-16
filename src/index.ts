@@ -1,4 +1,9 @@
-export { createPolynomial, Polynomial } from "./polynomial";
+export {
+  createPolynomial,
+  Polynomial,
+  createLagrange,
+  Lagrange,
+} from "./polynomial";
 
 export { Field, createField } from "./finite-field";
 
