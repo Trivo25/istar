@@ -1,4 +1,4 @@
-import { Field, createField } from "../";
+import { createField } from "..";
 
 describe("FiniteField tests", () => {
   describe("F_251 prime order field", () => {

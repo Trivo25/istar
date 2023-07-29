@@ -3,12 +3,14 @@ export {
   Polynomial,
   createLagrange,
   Lagrange,
-} from "./polynomial";
+} from "./math/polynomial";
 
-export { Field, createField } from "./finite-field";
+export { Field, FieldClass, createField } from "./math/finite-field";
 
 export {
   EllipticCurve,
   createEllipticCurve,
   GroupAffine,
-} from "./elliptic-curve";
+} from "./math/elliptic-curve";
+
+export { Groth16 } from "./protocol/groth16";
