@@ -62,8 +62,30 @@ function inverse(a: bigint, p: bigint) {
   return mod(x, p);
 }
 
-// TODO tonelli shanks
-function sqrt() {}
+function random(p: bigint) {
+  let size = Math.floor(p.toString(2).length / 8);
+  console.log(size);
+
+  while (true) {
+    let x = BigInt("0x" + randomBytes(size).toString("hex"));
+    if (x < p) return x;
+  }
+}
+
+function isSquare(x: bigint, p: bigint) {
+  if (x === 0n) return true;
+  return pow(x, (p - 1n) / 2n, p) === 1n;
+}
+
+/*
+Tonelli-Shanks algorithm.
+Input: 
+  p, a prime 
+  n, the n in r^2 = n
+Output:
+  r, the r in r^2 = n
+*/
+function sqrt(n: bigint, p: bigint) {}
 
 const createField = (p: bigint) =>
   class Field {
@@ -96,7 +118,7 @@ const createField = (p: bigint) =>
     }
 
     static random() {
-      return new Field(BigInt("0x" + randomBytes(256).toString("hex")));
+      return new Field(random(Field.p));
     }
 
     add(x: Field | bigint): Field {
@@ -137,6 +159,22 @@ const createField = (p: bigint) =>
 
     equals(a: Field | bigint) {
       return Field.isField(a) ? a.value === this.value : a === this.value;
+    }
+
+    lessThan(a: Field | bigint) {
+      return Field.isField(a) ? a.value > this.value : a > this.value;
+    }
+
+    lessThanOrEqual(a: Field | bigint) {
+      return Field.isField(a) ? a.value >= this.value : a >= this.value;
+    }
+
+    greaterThan(a: Field | bigint) {
+      return !this.lessThan(a);
+    }
+
+    greaterThanOrEqual(a: Field | bigint) {
+      return !this.lessThanOrEqual(a);
     }
 
     inRange() {

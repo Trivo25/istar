@@ -77,6 +77,50 @@ describe("FiniteField tests", () => {
       });
     });
 
+    describe("lessThan", () => {
+      it("243 < 250", () => {
+        expect(F_251.from(243n).lessThan(250n)).toBeTruthy();
+      });
+
+      it("1 < 250", () => {
+        expect(F_251.from(1n).lessThan(251n)).toBeTruthy();
+      });
+
+      it("false 250 < 1", () => {
+        expect(!F_251.from(250n).lessThan(1n)).toBeTruthy();
+      });
+
+      it("false 5 < 5", () => {
+        expect(!F_251.from(5n).lessThan(5n)).toBeTruthy();
+      });
+
+      it("false 1 < 0", () => {
+        expect(!F_251.from(1n).lessThan(0n)).toBeTruthy();
+      });
+    });
+
+    describe("greaterThan", () => {
+      it("241 > 213", () => {
+        expect(F_251.from(241n).greaterThan(213n)).toBeTruthy();
+      });
+
+      it("250 > 0", () => {
+        expect(F_251.from(250n).greaterThan(1n)).toBeTruthy();
+      });
+
+      it("false 1 > 250", () => {
+        expect(!F_251.from(1n).greaterThan(250n)).toBeTruthy();
+      });
+
+      it("false 4 > 5", () => {
+        expect(!F_251.from(4n).greaterThan(5n)).toBeTruthy();
+      });
+
+      it("false 0 > 1", () => {
+        expect(!F_251.from(0n).greaterThan(1n)).toBeTruthy();
+      });
+    });
+
     describe("util methods", () => {
       describe("toString", () => {
         it("p-1.toString", () => {
@@ -105,9 +149,7 @@ describe("FiniteField tests", () => {
       });
 
       it("random", () => {
-        expect(F_251.random().toBigint()).toBeLessThanOrEqual(
-          F_251.modulus - 1n
-        );
+        expect(F_251.random().lessThan(F_251.modulus - 1n));
       });
 
       it("equals", () => {
@@ -124,6 +166,16 @@ describe("FiniteField tests", () => {
           expect(F_251.from(i).inRange()).toBeTruthy();
         }
       });
+    });
+  });
+
+  describe("Large prime field", () => {
+    let p = 16491487749496951349n;
+    class F_large extends createField(p) {}
+
+    it("random element", () => {
+      let x = F_large.random();
+      expect(x.lessThan(p - 1n)).toBeTruthy();
     });
   });
 });
