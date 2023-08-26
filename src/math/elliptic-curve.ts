@@ -26,6 +26,8 @@ function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
     static b: Field = FieldClass_.from(params.b);
     static g: EllipticCurve = EllipticCurve.from(params.g);
 
+    static zero: EllipticCurve = EllipticCurve.from({ x: 0n, y: 0n });
+
     p: GroupAffine;
 
     constructor({ x: x_, y: y_ }: { x: Field | bigint; y: Field | bigint }) {
@@ -46,9 +48,17 @@ function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
       let x = FieldClass_.isField(x_) ? x_ : FieldClass_.from(x_);
       let y = FieldClass_.isField(y_) ? y_ : FieldClass_.from(y_);
 
+      // point of infinity; the neutral element of the group
+      if (x.equals(0n) && y.equals(0n)) return true;
+
       return y
         .mul(2n)
         .equals(x.mul(3n).add(x.add(EllipticCurve.a)).add(EllipticCurve.b));
+    }
+
+    isZero() {
+      let { x, y } = this.p;
+      return x.equals(0n) && y.equals(0n);
     }
 
     add(a: EllipticCurve | GroupAffine) {
@@ -57,7 +67,8 @@ function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
       let ax = a instanceof EllipticCurve ? a.p.x : a.x;
       let ay = a instanceof EllipticCurve ? a.p.y : a.y;
 
-      if (x.equals(ax) && y.equals(ay)) throw Error("Not implemented");
+      if ((x.equals(ax) && y.equals(ay)) || this.isZero())
+        throw Error("Not implemented");
 
       // dy = 3x^2 + a
       // dx = 2y
@@ -70,6 +81,25 @@ function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
       });
     }
 
+    double() {
+      let a = EllipticCurve.a;
+      let { x, y } = this.p;
+
+      let lx = x.mul(2n).mul(3n).add(a);
+      let ly = y.mul(2n);
+      let lambda = lx.div(ly);
+      let xr = lambda.mul(2n).sub(x.mul(2n));
+      let yr = lambda.mul(x.sub(xr)).sub(y);
+
+      return new EllipticCurve({
+        x: xr,
+        y: yr,
+      });
+    }
+
+    /**
+     * Negation of a point P. https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication#Point_negation
+     */
     neg() {
       return new EllipticCurve({
         x: this.p.x,

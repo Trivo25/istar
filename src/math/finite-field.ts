@@ -192,3 +192,9 @@ const createField = (p: bigint) =>
 
 type Field = InstanceType<ReturnType<typeof createField>>;
 type FieldClass = ReturnType<typeof createField>;
+
+/**
+ * Extends a given Field $F_n$ to $F_{n^k}$
+ * @param k
+ */
+function extend(k: bigint) {}
