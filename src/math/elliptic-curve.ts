@@ -52,8 +52,8 @@ function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
       if (x.equals(0n) && y.equals(0n)) return true;
 
       return y
-        .mul(2n)
-        .equals(x.mul(3n).add(x.add(EllipticCurve.a)).add(EllipticCurve.b));
+        .square()
+        .equals(x.pow(3n).add(x.mul(EllipticCurve.a)).add(EllipticCurve.b));
     }
 
     isZero() {
@@ -85,11 +85,10 @@ function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
       let a = EllipticCurve.a;
       let { x, y } = this.p;
 
-      let lx = x.mul(2n).mul(3n).add(a);
-      let ly = y.mul(2n);
-      let lambda = lx.div(ly);
-      let xr = lambda.mul(2n).sub(x.mul(2n));
-      let yr = lambda.mul(x.sub(xr)).sub(y);
+      let m = x.square().mul(3n).add(a).div(y.mul(2n));
+
+      let xr = m.square().sub(x.mul(2n));
+      let yr = m.mul(x.sub(xr)).sub(y);
 
       return new EllipticCurve({
         x: xr,
@@ -109,6 +108,22 @@ function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
 
     static from({ x, y }: { x: bigint | Field; y: bigint | Field }) {
       return new EllipticCurve({ x, y });
+    }
+
+    static random() {
+      let P = EllipticCurve.from({
+        x: FieldClass_.random(),
+        y: FieldClass_.random(),
+      });
+
+      while (!EllipticCurve.isPoint(P.p)) {
+        P = EllipticCurve.from({
+          x: FieldClass_.random(),
+          y: FieldClass_.random(),
+        });
+      }
+
+      return P;
     }
   };
 }
