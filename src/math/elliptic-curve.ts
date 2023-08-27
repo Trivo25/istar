@@ -64,20 +64,27 @@ function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
     add(a: EllipticCurve | GroupAffine) {
       let { x, y } = this.p;
 
-      let ax = a instanceof EllipticCurve ? a.p.x : a.x;
-      let ay = a instanceof EllipticCurve ? a.p.y : a.y;
+      let xq = a instanceof EllipticCurve ? a.p.x : a.x;
+      let yq = a instanceof EllipticCurve ? a.p.y : a.y;
 
-      if ((x.equals(ax) && y.equals(ay)) || this.isZero())
-        throw Error("Not implemented");
+      if ((x.equals(xq) && y.equals(yq)) || this.isZero()) return this.double();
 
-      // dy = 3x^2 + a
-      // dx = 2y
-      let dy = x.mul(3n).pow(2n).add(EllipticCurve.a);
-      let dx = y.mul(2n);
+      if (this.isZero()) {
+        if (xq.equals(0n) && yq.equals(0n)) return this;
+        else new EllipticCurve({ x: xq, y: yq });
+      }
+
+      let { x: xp, y: yp } = this.p;
+
+      // https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication
+      let m = yq.sub(yp).div(xq.sub(xp));
+
+      let xr = m.square().sub(xp).sub(xq);
+      let yr = m.mul(xp.sub(xr)).sub(yp);
 
       return new EllipticCurve({
-        x: dx,
-        y: dy,
+        x: xr,
+        y: yr,
       });
     }
 
@@ -104,6 +111,15 @@ function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
         x: this.p.x,
         y: this.p.y.mul(-1n),
       });
+    }
+
+    equals(a: EllipticCurve | GroupAffine) {
+      let { x, y } = this.p;
+
+      let ax = a instanceof EllipticCurve ? a.p.x : a.x;
+      let ay = a instanceof EllipticCurve ? a.p.y : a.y;
+
+      return x.equals(ax) && y.equals(ay);
     }
 
     static from({ x, y }: { x: bigint | Field; y: bigint | Field }) {

@@ -1,10 +1,14 @@
 import { EllipticCurve, createField, createEllipticCurve } from "..";
 describe("Elliptic Curve (Group) tests", () => {
-  describe("p=17, Group", () => {
-    class F_17 extends createField(17n) {}
-    let G = createEllipticCurve(F_17, { a: 2n, b: 2n, g: { x: 5n, y: 1n } });
+  describe("p=13, Group", () => {
+    class F extends createField(101n) {}
+    let G = createEllipticCurve(F, {
+      a: 0n,
+      b: 3n,
+      g: { x: 1n, y: 2n },
+    });
 
-    /*     describe("invalid group elements", () => {
+    describe("invalid group elements", () => {
       it("(2, 2)", () => {
         expect(() => {
           G.from({ y: 2n, x: 2n });
@@ -24,30 +28,69 @@ describe("Elliptic Curve (Group) tests", () => {
       });
     });
 
-    describe("valid group elements", () => {
+    describe("valid group elements construction", () => {
       it("g", () => {
         expect(() => G.g).not.toThrow(Error);
       });
 
-      it("(4, 2)", () => {
-        expect(() => G.from({ x: 4n, y: 2n })).not.toThrow(Error);
+      it("(1, 99)", () => {
+        expect(() => G.from({ x: 1n, y: 99n })).not.toThrow(Error);
       });
 
-      it("(7, 8)", () => {
-        expect(() => G.from({ x: 7n, y: 8n })).not.toThrow(Error);
+      it("(26, 45)", () => {
+        expect(() => G.from({ x: 26n, y: 45n })).not.toThrow(Error);
       });
 
       it("infinity", () => {
         expect(() => G.from({ x: 0n, y: 0n })).not.toThrow(Error);
       });
-    }); */
+    });
 
     describe("double", () => {
-      it("(4, 2) + (4, 2)", () => {
-        console.log(F_17.from(2n).inverse());
+      it("2(1, 2)", () => {
+        expect(
+          G.g.double().equals({
+            x: F.from(68n),
+            y: F.from(74n),
+          })
+        ).toBeTruthy();
+      });
 
-        console.log(F_17.from(1n).div(2n));
-        console.log(G.from({ x: 4n, y: 2n }).double());
+      it("4(1, 2)", () => {
+        expect(
+          G.g
+            .double()
+            .double()
+            .equals({
+              x: F.from(65n),
+              y: F.from(98n),
+            })
+        ).toBeTruthy();
+      });
+
+      it("8(1, 2)", () => {
+        expect(
+          G.g
+            .double()
+            .double()
+            .double()
+            .equals({
+              x: F.from(18n),
+              y: F.from(49n),
+            })
+        ).toBeTruthy();
+      });
+
+      it("3(1, 2)", () => {
+        expect(
+          G.g
+            .double()
+            .add(G.g)
+            .equals({
+              x: F.from(26n),
+              y: F.from(45n),
+            })
+        ).toBeTruthy();
       });
     });
   });

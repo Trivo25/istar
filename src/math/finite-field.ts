@@ -139,6 +139,10 @@ const createField = (p: bigint) =>
       );
     }
 
+    square(): Field {
+      return new Field(pow(this.value, 2n, Field.p));
+    }
+
     pow(x: Field | bigint): Field {
       return new Field(
         pow(this.value, Field.isField(x) ? x.value : x, Field.p)
@@ -146,9 +150,7 @@ const createField = (p: bigint) =>
     }
 
     div(x: Field | bigint) {
-      return new Field(
-        div(this.value, Field.isField(x) ? x.value : x, Field.p)!
-      );
+      return this.mul(Field.from(x).inverse());
     }
 
     inverse() {
