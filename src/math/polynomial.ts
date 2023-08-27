@@ -175,6 +175,7 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
       let n = this.degree() + 1;
       for (let i = 0; i < n; i++) {
         let c = this.coefficients[i];
+        if (c.equals(0n) && this.coefficients.length !== 1) continue;
         s += c.toString();
         if (i != 0) s += "x^" + i;
         if (i != n - 1) s += " + ";

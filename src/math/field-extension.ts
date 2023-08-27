@@ -18,7 +18,7 @@ const extend = (
         throw Error("Degree of the polynomial needs to be less than 2");
 
       super(coeffs);
-      let { R } = this.div(this.modulus); //PolynomialClass.from(coeffs).div(this.modulus);
+      let { R } = super.div(this.modulus); //PolynomialClass.from(coeffs).div(this.modulus);
       this.coefficients = R.coefficients;
     }
 
@@ -27,13 +27,13 @@ const extend = (
     }
 
     mul(q: FieldExtension): FieldExtension {
-      return new FieldExtension(this.mul(q).coefficients);
+      return new FieldExtension(super.mul(q).div(this.modulus).R.coefficients);
     }
     add(q: FieldExtension): FieldExtension {
-      return new FieldExtension(this.add(q).coefficients);
+      return new FieldExtension(super.add(q).coefficients);
     }
     sub(q: FieldExtension): FieldExtension {
-      return new FieldExtension(this.sub(q).coefficients);
+      return new FieldExtension(super.sub(q).coefficients);
     }
   };
 };
