@@ -8,6 +8,12 @@ export {
 export { Field, FieldClass, createField } from "./math/finite-field";
 
 export {
+  FieldExtension,
+  FieldExtensionClass,
+  extend,
+} from "./math/field-extension";
+
+export {
   EllipticCurve,
   createEllipticCurve,
   GroupAffine,
