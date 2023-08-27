@@ -88,6 +88,17 @@ function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
       });
     }
 
+    scale(s: bigint): EllipticCurve {
+      let P = new EllipticCurve(this.p);
+      if (s === 0n) return EllipticCurve.zero;
+      else if (s === 1n) return this;
+      else if (s % 2n === 1n) {
+        return P.add(P.scale(s - 1n));
+      } else {
+        return P.double().scale(s / 2n);
+      }
+    }
+
     double() {
       let a = EllipticCurve.a;
       let { x, y } = this.p;

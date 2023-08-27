@@ -93,5 +93,37 @@ describe("Elliptic Curve (Group) tests", () => {
         ).toBeTruthy();
       });
     });
+
+    describe("scale", () => {
+      it("3(1, 2)", () => {
+        expect(G.g.double().add(G.g).equals(G.g.scale(3n))).toBeTruthy();
+      });
+
+      it("5*(1, 2)", () => {
+        expect(
+          G.g.scale(5n).equals({
+            x: F.from(12n),
+            y: F.from(32n),
+          })
+        ).toBeTruthy();
+      });
+
+      it("87*(1, 2)", () => {
+        expect(
+          G.g.scale(87n).equals({
+            x: F.from(68n),
+            y: F.from(74n),
+          })
+        ).toBeTruthy();
+      });
+
+      it("0*(1, 2)", () => {
+        expect(G.g.scale(0n).equals(G.zero)).toBeTruthy();
+      });
+
+      it("1*(1, 2)", () => {
+        expect(G.g.scale(1n).equals(G.g)).toBeTruthy();
+      });
+    });
   });
 });
