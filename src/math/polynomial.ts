@@ -10,6 +10,13 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
       return FieldClass;
     }
     constructor(coeffs: Field[]) {
+      // remove trailing zeroes
+      while (
+        coeffs[coeffs.length - 1] &&
+        coeffs[coeffs.length - 1].equals(0n)
+      ) {
+        coeffs.pop();
+      }
       this.coefficients = coeffs;
     }
 
@@ -20,6 +27,37 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
     static x() {
       // 0 + 1x
       return new Polynomial([FieldClass.from(0n), FieldClass.from(1n)]);
+    }
+
+    div(B: Polynomial) {
+      if (B.coefficients.find((c) => !c.equals(0n)) === undefined)
+        throw Error("Divisor polynomial cannot be the zero polynomial!");
+
+      let Q = new Polynomial([FieldClass.from(0n)]);
+      let R = new Polynomial(this.coefficients);
+      let d = B.degree();
+      let c = B.lc();
+
+      while (R.degree() >= d) {
+        let n = R.degree() - d;
+        let e = R.lc().div(c);
+        let S_coefficients = new Array<Field>(n + 1).fill(FieldClass.from(0n));
+
+        S_coefficients[n] = e;
+
+        let S = new Polynomial(S_coefficients);
+
+        Q = Q.add(S);
+        let sb = S.mul(B);
+        R = R.sub(sb);
+      }
+
+      if (!Q.mul(B).add(R).equals(this)) throw Error("Something went wrong");
+
+      return {
+        Q,
+        R,
+      };
     }
 
     mul(p: Polynomial) {
@@ -65,6 +103,24 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
       return new Polynomial(coeffs);
     }
 
+    sub(p: Polynomial) {
+      let a = p.coefficients;
+      let b = this.coefficients;
+
+      if (a.length >= b.length) {
+        b = b.concat(Array(a.length - b.length).fill(FieldClass.from(0n)));
+      } else {
+        a = a.concat(Array(b.length - a.length).fill(FieldClass.from(0n)));
+      }
+
+      let coeffs = [];
+      for (let i = 0; i < Math.max(a.length, b.length); i++) {
+        coeffs.push(b[i].sub(a.at(i) ?? FieldClass.from(0n)));
+      }
+
+      return new Polynomial(coeffs);
+    }
+
     eval(x_: Field | bigint) {
       let x = FieldClass.isField(x_) ? x_ : FieldClass.from(x_);
       return this.coefficients.reduce((a, b, i) => {
@@ -84,6 +140,10 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
         if (!this.coefficients[i].equals(p.coefficients[i])) return false;
       }
       return true;
+    }
+
+    lc() {
+      return this.coefficients[this.coefficients.length - 1];
     }
 
     degree() {
@@ -190,3 +250,16 @@ function createLagrange(FieldClass: ReturnType<typeof createField>) {
 
 type Polynomial = InstanceType<ReturnType<typeof createPolynomial>>;
 type Lagrange = InstanceType<ReturnType<typeof createLagrange>>;
+
+function removeLeadingZeros(arr: Field[]) {
+  let i = 0;
+  let result = [];
+  while (arr[i].equals(0n)) {
+    i++;
+  }
+  while (i < arr.length) {
+    result.push(arr[i]);
+    i++;
+  }
+  return result;
+}
