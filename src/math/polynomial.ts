@@ -23,16 +23,19 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
     }
 
     mul(p: Polynomial) {
-      let dp = p.degree() + 1;
-      let dthis = this.degree() + 1;
+      let m = p.degree() + 1;
+      let n = this.degree() + 1;
 
-      let prod = new Array<Field>(dp + dthis - 1).fill(FieldClass.from(0n));
+      let A = m > n ? p : new Polynomial(this.coefficients);
+      let B = m > n ? new Polynomial(this.coefficients) : p;
 
-      for (let i = 0; i < dp; i++) {
-        for (let j = 0; j < dthis; j++) {
-          prod[i + j] = prod[i + j].add(
-            this.coefficients[i].mul(p.coefficients[j])
-          );
+      let prod = new Array<Field>(m + n - 1).fill(FieldClass.from(0n));
+
+      for (let i = 0; i < Math.max(m, n); i++) {
+        for (let j = 0; j < Math.min(m, n); j++) {
+          let b = B.coefficients[j];
+          let a = A.coefficients[i];
+          prod[i + j] = prod[i + j].add(b.mul(a));
         }
       }
 
