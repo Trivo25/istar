@@ -64,15 +64,16 @@ function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
     add(a: EllipticCurve | GroupAffine) {
       let { x, y } = this.p;
 
-      let xq = a instanceof EllipticCurve ? a.p.x : a.x;
-      let yq = a instanceof EllipticCurve ? a.p.y : a.y;
-
-      if ((x.equals(xq) && y.equals(yq)) || this.isZero()) return this.double();
+      let { x: xq, y: yq } = this.destructAffineOrGroup(a);
 
       if (this.isZero()) {
-        if (xq.equals(0n) && yq.equals(0n)) return this;
-        else new EllipticCurve({ x: xq, y: yq });
+        return new EllipticCurve({ x: xq, y: yq });
+      } else if (xq.equals(0n) && yq.equals(0n)) {
+        return new EllipticCurve(this.p);
       }
+
+      // two points are the same, special case
+      if (x.equals(xq) && y.equals(yq)) return this.double();
 
       let { x: xp, y: yp } = this.p;
 
@@ -127,30 +128,20 @@ function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
     equals(a: EllipticCurve | GroupAffine) {
       let { x, y } = this.p;
 
-      let ax = a instanceof EllipticCurve ? a.p.x : a.x;
-      let ay = a instanceof EllipticCurve ? a.p.y : a.y;
+      let { x: xa, y: ya } = this.destructAffineOrGroup(a);
 
-      return x.equals(ax) && y.equals(ay);
+      return x.equals(xa) && y.equals(ya);
     }
 
     static from({ x, y }: { x: bigint | Field; y: bigint | Field }) {
       return new EllipticCurve({ x, y });
     }
 
-    static random() {
-      let P = EllipticCurve.from({
-        x: FieldClass_.random(),
-        y: FieldClass_.random(),
-      });
-
-      while (!EllipticCurve.isPoint(P.p)) {
-        P = EllipticCurve.from({
-          x: FieldClass_.random(),
-          y: FieldClass_.random(),
-        });
-      }
-
-      return P;
+    destructAffineOrGroup(a: EllipticCurve | GroupAffine) {
+      return {
+        x: a instanceof EllipticCurve ? a.p.x : a.x,
+        y: a instanceof EllipticCurve ? a.p.y : a.y,
+      };
     }
   };
 }
