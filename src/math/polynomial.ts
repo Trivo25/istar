@@ -1,4 +1,4 @@
-import { Field, createField } from "./finite-field";
+import { Field, FieldClass, createField } from "./finite-field";
 
 export { createPolynomial, Polynomial, createLagrange, Lagrange };
 
@@ -20,6 +20,23 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
     static x() {
       // 0 + 1x
       return new Polynomial([FieldClass.from(0n), FieldClass.from(1n)]);
+    }
+
+    mul(p: Polynomial) {
+      let dp = p.degree() + 1;
+      let dthis = this.degree() + 1;
+
+      let prod = new Array<Field>(dp + dthis - 1).fill(FieldClass.from(0n));
+
+      for (let i = 0; i < dp; i++) {
+        for (let j = 0; j < dthis; j++) {
+          prod[i + j] = prod[i + j].add(
+            this.coefficients[i].mul(p.coefficients[j])
+          );
+        }
+      }
+
+      return new Polynomial(prod);
     }
 
     add(p: Polynomial) {
@@ -72,6 +89,19 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
 
     toString() {
       return this.coefficients.map((c) => c.toString());
+    }
+
+    toPretty() {
+      let s = "";
+      let n = this.degree() + 1;
+      for (let i = 0; i < n; i++) {
+        let c = this.coefficients[i];
+        if (c.equals(0n)) continue;
+        s += c.toString();
+        if (i != 0) s += "x^" + i;
+        if (i != n - 1) s += " + ";
+      }
+      return s;
     }
   };
 }

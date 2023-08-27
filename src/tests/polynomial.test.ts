@@ -69,6 +69,23 @@ describe("Polynomial tests", () => {
     });
   });
 
+  describe("mul", () => {
+    it("x + 2x^2 * 2x^2 = 2x^3 + 4x^4", () => {
+      let p1 = P_251.from([F.from(0n), F.from(1n), F.from(2n)]);
+      let p2 = P_251.from([F.from(0n), F.from(0n), F.from(2n)]);
+
+      let target = P_251.from([
+        F.from(0n),
+        F.from(0n),
+        F.from(0n),
+        F.from(2n),
+        F.from(4n),
+      ]);
+      console.log(p2.mul(p1).toPretty());
+      expect(p2.mul(p1).equals(target)).toBeTruthy();
+    });
+  });
+
   describe("add", () => {
     it("1x + 1x = 2x", () => {
       expect(
