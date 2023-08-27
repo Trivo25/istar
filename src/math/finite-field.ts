@@ -64,8 +64,6 @@ function inverse(a: bigint, p: bigint) {
 
 function random(p: bigint) {
   let size = Math.floor(p.toString(2).length / 8);
-  console.log(size);
-
   while (true) {
     let x = BigInt("0x" + randomBytes(size).toString("hex"));
     if (x < p) return x;
