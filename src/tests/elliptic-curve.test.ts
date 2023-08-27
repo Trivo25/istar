@@ -46,6 +46,35 @@ describe("Elliptic Curve (Group) tests", () => {
       });
     });
 
+    describe("add", () => {
+      it("zero + (1, 2)", () => {
+        expect(G.g.add(G.zero).equals(G.g)).toBeTruthy();
+      });
+
+      it("(1, 2) + zero", () => {
+        expect(G.zero.add(G.g).equals(G.g)).toBeTruthy();
+      });
+
+      it("zero + zero", () => {
+        expect(G.zero.add(G.zero).equals(G.zero)).toBeTruthy();
+      });
+
+      it("2P = double(P)", () => {
+        expect(G.g.add(G.g).equals(G.g.double())).toBeTruthy();
+      });
+    });
+
+    describe("neg", () => {
+      it("-(1, 2)", () => {
+        expect(
+          G.g.neg().equals({
+            x: F.from(1n),
+            y: F.from(-2n),
+          })
+        ).toBeTruthy();
+      });
+    });
+
     describe("double", () => {
       it("2(1, 2)", () => {
         expect(
@@ -90,6 +119,56 @@ describe("Elliptic Curve (Group) tests", () => {
               x: F.from(26n),
               y: F.from(45n),
             })
+        ).toBeTruthy();
+      });
+    });
+
+    describe("scale", () => {
+      it("3(1, 2)", () => {
+        expect(G.g.double().add(G.g).equals(G.g.scale(3n))).toBeTruthy();
+      });
+
+      it("5*(1, 2)", () => {
+        expect(
+          G.g.scale(5n).equals({
+            x: F.from(12n),
+            y: F.from(32n),
+          })
+        ).toBeTruthy();
+      });
+
+      it("87*(1, 2)", () => {
+        expect(
+          G.g.scale(87n).equals({
+            x: F.from(68n),
+            y: F.from(74n),
+          })
+        ).toBeTruthy();
+      });
+
+      it("0*(1, 2)", () => {
+        expect(G.g.scale(0n).equals(G.zero)).toBeTruthy();
+      });
+
+      it("1*(1, 2)", () => {
+        expect(G.g.scale(1n).equals(G.g)).toBeTruthy();
+      });
+
+      it("122*(1, 2)", () => {
+        expect(
+          G.g.scale(122n).equals({
+            x: F.from(26n),
+            y: F.from(45n),
+          })
+        ).toBeTruthy();
+      });
+
+      it("500*(1, 2)", () => {
+        expect(
+          G.g.scale(500n).equals({
+            x: F.from(91n),
+            y: F.from(35n),
+          })
         ).toBeTruthy();
       });
     });

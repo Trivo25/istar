@@ -1,4 +1,4 @@
-import { Field, createField } from "./finite-field";
+import { Field, FieldClass, createField } from "./finite-field";
 
 export { createPolynomial, Polynomial, createLagrange, Lagrange };
 
@@ -10,6 +10,13 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
       return FieldClass;
     }
     constructor(coeffs: Field[]) {
+      // remove trailing zeroes
+      while (
+        coeffs[coeffs.length - 1] &&
+        coeffs[coeffs.length - 1].equals(0n)
+      ) {
+        coeffs.pop();
+      }
       this.coefficients = coeffs;
     }
 
@@ -20,6 +27,57 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
     static x() {
       // 0 + 1x
       return new Polynomial([FieldClass.from(0n), FieldClass.from(1n)]);
+    }
+
+    div(B: Polynomial) {
+      if (B.coefficients.find((c) => !c.equals(0n)) === undefined)
+        throw Error("Divisor polynomial cannot be the zero polynomial!");
+
+      let Q = new Polynomial([FieldClass.from(0n)]);
+      let R = new Polynomial(this.coefficients);
+      let d = B.degree();
+      let c = B.lc();
+
+      while (R.degree() >= d) {
+        let n = R.degree() - d;
+        let e = R.lc().div(c);
+        let S_coefficients = new Array<Field>(n + 1).fill(FieldClass.from(0n));
+
+        S_coefficients[n] = e;
+
+        let S = new Polynomial(S_coefficients);
+
+        Q = Q.add(S);
+        let sb = S.mul(B);
+        R = R.sub(sb);
+      }
+
+      if (!Q.mul(B).add(R).equals(this)) throw Error("Something went wrong");
+
+      return {
+        Q,
+        R,
+      };
+    }
+
+    mul(p: Polynomial) {
+      let m = p.degree() + 1;
+      let n = this.degree() + 1;
+
+      let A = m > n ? p : new Polynomial(this.coefficients);
+      let B = m > n ? new Polynomial(this.coefficients) : p;
+
+      let prod = new Array<Field>(m + n - 1).fill(FieldClass.from(0n));
+
+      for (let i = 0; i < Math.max(m, n); i++) {
+        for (let j = 0; j < Math.min(m, n); j++) {
+          let b = B.coefficients[j];
+          let a = A.coefficients[i];
+          prod[i + j] = prod[i + j].add(b.mul(a));
+        }
+      }
+
+      return new Polynomial(prod);
     }
 
     add(p: Polynomial) {
@@ -34,7 +92,30 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
 
       let coeffs = [];
       for (let i = 0; i < a.length; i++) {
-        coeffs.push(a[i].add(b[i]));
+        let c = b.at(i);
+        if (c) {
+          coeffs.push(a[i].add(c));
+        } else {
+          coeffs.push(a[i]);
+        }
+      }
+
+      return new Polynomial(coeffs);
+    }
+
+    sub(p: Polynomial) {
+      let a = p.coefficients;
+      let b = this.coefficients;
+
+      if (a.length >= b.length) {
+        b = b.concat(Array(a.length - b.length).fill(FieldClass.from(0n)));
+      } else {
+        a = a.concat(Array(b.length - a.length).fill(FieldClass.from(0n)));
+      }
+
+      let coeffs = [];
+      for (let i = 0; i < Math.max(a.length, b.length); i++) {
+        coeffs.push(b[i].sub(a.at(i) ?? FieldClass.from(0n)));
       }
 
       return new Polynomial(coeffs);
@@ -61,8 +142,29 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
       return true;
     }
 
+    lc() {
+      return this.coefficients[this.coefficients.length - 1];
+    }
+
     degree() {
       return this.coefficients.length - 1;
+    }
+
+    toString() {
+      return this.coefficients.map((c) => c.toString());
+    }
+
+    toPretty() {
+      let s = "";
+      let n = this.degree() + 1;
+      for (let i = 0; i < n; i++) {
+        let c = this.coefficients[i];
+        if (c.equals(0n)) continue;
+        s += c.toString();
+        if (i != 0) s += "x^" + i;
+        if (i != n - 1) s += " + ";
+      }
+      return s;
     }
   };
 }
@@ -148,3 +250,16 @@ function createLagrange(FieldClass: ReturnType<typeof createField>) {
 
 type Polynomial = InstanceType<ReturnType<typeof createPolynomial>>;
 type Lagrange = InstanceType<ReturnType<typeof createLagrange>>;
+
+function removeLeadingZeros(arr: Field[]) {
+  let i = 0;
+  let result = [];
+  while (arr[i].equals(0n)) {
+    i++;
+  }
+  while (i < arr.length) {
+    result.push(arr[i]);
+    i++;
+  }
+  return result;
+}
