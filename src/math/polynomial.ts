@@ -34,7 +34,12 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
 
       let coeffs = [];
       for (let i = 0; i < a.length; i++) {
-        coeffs.push(a[i].add(b[i]));
+        let c = b.at(i);
+        if (c) {
+          coeffs.push(a[i].add(c));
+        } else {
+          coeffs.push(a[i]);
+        }
       }
 
       return new Polynomial(coeffs);
@@ -63,6 +68,10 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
 
     degree() {
       return this.coefficients.length - 1;
+    }
+
+    toString() {
+      return this.coefficients.map((c) => c.toString());
     }
   };
 }

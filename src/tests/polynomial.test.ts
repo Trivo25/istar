@@ -14,7 +14,7 @@ describe("Polynomial tests", () => {
     let p: Polynomial;
 
     beforeAll(() => {
-      p = P_251.from([new F(12n), new F(2n), new F(1n)]);
+      p = P_251.from([F.from(12n), F.from(2n), F.from(1n)]);
     });
 
     it("deg(12 + 2x + x^2) = 2", () => {
@@ -42,7 +42,7 @@ describe("Polynomial tests", () => {
     });
 
     it("x polynomial is correct", () => {
-      expect(p.equals(P_251.x())).toEqual(true);
+      expect(p.equals(P_251.x())).toBeTruthy();
     });
 
     it("deg(x) = 1", () => {
@@ -75,7 +75,25 @@ describe("Polynomial tests", () => {
         P_251.x()
           .add(P_251.x())
           .equals(P_251.from([F.from(0n), F.from(2n)]))
-      ).toEqual(true);
+      ).toBeTruthy();
+    });
+
+    it("x + 2x^2 = x + 2x^2", () => {
+      let p1 = P_251.x();
+      let p2 = P_251.from([F.from(0n), F.from(0n), F.from(2n)]);
+
+      let target = P_251.from([F.from(0n), F.from(1n), F.from(2n)]);
+
+      expect(p1.add(p2).equals(target)).toBeTruthy();
+    });
+
+    it("2x^2 + x = x + 2x^2", () => {
+      let p1 = P_251.x();
+      let p2 = P_251.from([F.from(0n), F.from(0n), F.from(2n)]);
+
+      let target = P_251.from([F.from(0n), F.from(1n), F.from(2n)]);
+
+      expect(p2.add(p1).equals(target)).toBeTruthy();
     });
   });
 });
