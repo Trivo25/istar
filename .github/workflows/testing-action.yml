@@ -1,0 +1,23 @@
+name: Testing
+on:
+  push:
+  pull_request:
+  workflow_dispatch: {}
+
+jobs:
+  Unit-test:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+      - name: Build and testproject
+        continue-on-error: false
+        run: |
+          npm ci
+          npm run build
+          npm run test
