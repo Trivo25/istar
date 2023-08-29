@@ -1,29 +1,29 @@
 import { EllipticCurve, createField, createEllipticCurve } from "..";
 describe("Elliptic Curve (Group) tests", () => {
   describe("p=13, Group", () => {
-    class F extends createField(101n) {}
+    const F = createField(101n);
     let G = createEllipticCurve(F, {
-      a: 0n,
-      b: 3n,
-      g: { x: 1n, y: 2n },
+      a: F.from(0n),
+      b: F.from(3n),
+      g: { x: F.from(1n), y: F.from(2n) },
     });
 
     describe("invalid group elements", () => {
       it("(2, 2)", () => {
         expect(() => {
-          G.from({ y: 2n, x: 2n });
+          G.from({ y: F.from(2n), x: F.from(2n) });
         }).toThrow(Error);
       });
 
       it("(5, 5)", () => {
         expect(() => {
-          G.from({ y: 5n, x: 5n });
+          G.from({ y: F.from(5n), x: F.from(5n) });
         }).toThrow(Error);
       });
 
       it("(2, 6)", () => {
         expect(() => {
-          G.from({ y: 2n, x: 6n });
+          G.from({ y: F.from(2n), x: F.from(6n) });
         }).toThrow(Error);
       });
     });
@@ -34,15 +34,21 @@ describe("Elliptic Curve (Group) tests", () => {
       });
 
       it("(1, 99)", () => {
-        expect(() => G.from({ x: 1n, y: 99n })).not.toThrow(Error);
+        expect(() => G.from({ x: F.from(1n), y: F.from(99n) })).not.toThrow(
+          Error
+        );
       });
 
       it("(26, 45)", () => {
-        expect(() => G.from({ x: 26n, y: 45n })).not.toThrow(Error);
+        expect(() => G.from({ x: F.from(26n), y: F.from(45n) })).not.toThrow(
+          Error
+        );
       });
 
       it("infinity", () => {
-        expect(() => G.from({ x: 0n, y: 0n })).not.toThrow(Error);
+        expect(() => G.from({ x: F.from(0n), y: F.from(0n) })).not.toThrow(
+          Error
+        );
       });
     });
 

@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
 
-export { Field, FieldClass, createField };
+export { Field, createField };
 
 function mod(a: bigint, p: bigint) {
   let x = a % p;
@@ -76,125 +76,109 @@ function isSquare(x: bigint, p: bigint) {
 }
 
 /*
-Tonelli-Shanks algorithm.
-Input: 
-  p, a prime 
-  n, the n in r^2 = n
-Output:
-  r, the r in r^2 = n
-*/
+  Tonelli-Shanks algorithm.
+  Input: 
+    p, a prime 
+    n, the n in r^2 = n
+  Output:
+    r, the r in r^2 = n
+  */
 function sqrt(n: bigint, p: bigint) {}
 
-const createField = (p: bigint) =>
-  class Field {
-    value: bigint;
+// T is the base type, e.g. number or bigint
+class Field<T = bigint> {
+  value: bigint;
+  p: bigint;
+  constructor(value: bigint, p: bigint) {
+    this.p = p;
+    this.value = mod(value, p);
+  }
 
-    static p: bigint = p;
+  add(x: Field<T>) {
+    return new Field(add(this.value, x.value, this.p), this.p);
+  }
 
-    constructor(x: bigint | Field) {
-      this.value = mod(Field.isField(x) ? x.value : x, Field.p);
+  toString() {
+    return this.value.toString();
+  }
+
+  sub(x: Field<T>): Field {
+    return new Field(sub(this.value, x.value, this.p), this.p);
+  }
+
+  mul(x: Field<T>): Field {
+    return new Field(mul(this.value, x.value, this.p), this.p);
+  }
+
+  square(): Field {
+    return new Field(pow(this.value, 2n, this.p), this.p);
+  }
+
+  pow(x: Field<T>): Field {
+    return new Field(pow(this.value, x.value, this.p), this.p);
+  }
+
+  div(x: Field<T>): Field {
+    return this.mul(x.inverse());
+  }
+
+  inverse() {
+    let x = inverse(this.value, this.p)!;
+    //if (x === undefined) return undefined;
+    return new Field(x, this.p);
+  }
+
+  equals(a: Field<T>) {
+    return a.value === this.value;
+  }
+
+  lessThan(a: Field<T>) {
+    return a.value > this.value;
+  }
+
+  lessThanOrEqual(a: Field<T>) {
+    return a.value >= this.value;
+  }
+
+  greaterThan(a: Field<T>) {
+    return !this.lessThan(a);
+  }
+
+  greaterThanOrEqual(a: Field<bigint>) {
+    return !this.lessThanOrEqual(a);
+  }
+
+  inRange() {
+    return this.value <= this.p;
+  }
+
+  toBigInt() {
+    return this.value;
+  }
+}
+
+function createField(p: bigint) {
+  return class Fp extends Field {
+    p = p;
+    static modulus = p;
+    constructor(value: bigint) {
+      super(value, p);
     }
 
-    static get modulus() {
-      return this.p;
-    }
-
-    toBigint() {
-      return this.value;
-    }
-
-    toString() {
-      return this.value.toString();
+    static from(value: bigint) {
+      return new Field(value, p);
     }
 
     static zero() {
-      return new Field(0n);
+      return new Field(0n, p);
     }
 
     static one() {
-      return new Field(1n);
+      return new Field(1n, p);
     }
 
     static random() {
-      return new Field(random(Field.p));
-    }
-
-    add(x: Field | bigint): Field {
-      return new Field(
-        add(this.value, Field.isField(x) ? x.value : x, Field.p)
-      );
-    }
-
-    sub(x: Field | bigint): Field {
-      return new Field(
-        sub(this.value, Field.isField(x) ? x.value : x, Field.p)
-      );
-    }
-
-    mul(x: Field | bigint): Field {
-      return new Field(
-        mul(this.value, Field.isField(x) ? x.value : x, Field.p)
-      );
-    }
-
-    square(): Field {
-      return new Field(pow(this.value, 2n, Field.p));
-    }
-
-    pow(x: Field | bigint): Field {
-      return new Field(
-        pow(this.value, Field.isField(x) ? x.value : x, Field.p)
-      );
-    }
-
-    div(x: Field | bigint) {
-      return this.mul(Field.from(x).inverse());
-    }
-
-    inverse() {
-      let x = inverse(this.value, Field.p)!;
-      //if (x === undefined) return undefined;
-      return new Field(x);
-    }
-
-    equals(a: Field | bigint) {
-      return Field.isField(a) ? a.value === this.value : a === this.value;
-    }
-
-    lessThan(a: Field | bigint) {
-      return Field.isField(a) ? a.value > this.value : a > this.value;
-    }
-
-    lessThanOrEqual(a: Field | bigint) {
-      return Field.isField(a) ? a.value >= this.value : a >= this.value;
-    }
-
-    greaterThan(a: Field | bigint) {
-      return !this.lessThan(a);
-    }
-
-    greaterThanOrEqual(a: Field | bigint) {
-      return !this.lessThanOrEqual(a);
-    }
-
-    inRange() {
-      return this.value <= Field.p;
-    }
-
-    static from(x: bigint | Field) {
-      return new Field(x);
-    }
-
-    static isField(x: Field | bigint): x is Field {
-      return typeof x !== "bigint";
+      return new Field(random(p), p);
     }
   };
-
-type Field = InstanceType<ReturnType<typeof createField>>;
-type FieldClass = ReturnType<typeof createField>;
-
-/**
- * Extends a given Field $F_n$ to $F_{n^k}$
- * @param k
- */
-function extend(k: bigint) {}
+}

@@ -1,4 +1,4 @@
-import { Field, FieldClass } from "./finite-field";
+import { Field, createField } from "./finite-field";
 
 export { EllipticCurve, GroupAffine, createEllipticCurve };
 
@@ -8,27 +8,30 @@ type GroupAffine = {
 };
 
 type CurveParams = {
-  a: bigint;
-  b: bigint;
-  g: { x: bigint; y: bigint };
+  a: Field;
+  b: Field;
+  g: { x: Field; y: Field };
 };
 
-function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
+function createEllipticCurve(
+  FieldClass_: ReturnType<typeof createField>,
+  params: CurveParams
+) {
   return class EllipticCurve {
     // y^2 = x^3 + ax + b
-    static a: Field = FieldClass_.from(params.a);
-    static b: Field = FieldClass_.from(params.b);
+    static a: Field = params.a;
+    static b: Field = params.b;
     static g: EllipticCurve = EllipticCurve.from(params.g);
 
-    static zero: EllipticCurve = EllipticCurve.from({ x: 0n, y: 0n });
+    static zero: EllipticCurve = EllipticCurve.from({
+      x: FieldClass_.from(0n),
+      y: FieldClass_.from(0n),
+    });
 
     p: GroupAffine;
 
-    constructor({ x: x_, y: y_ }: { x: Field | bigint; y: Field | bigint }) {
+    constructor({ x, y }: { x: Field; y: Field }) {
       // y^2 = x^3 + ax + b
-      let x = FieldClass_.isField(x_) ? x_ : FieldClass_.from(x_);
-      let y = FieldClass_.isField(y_) ? y_ : FieldClass_.from(y_);
-
       if (!EllipticCurve.isPoint({ x, y }))
         throw new Error(`(${x}, ${y}) is not a valid point on this curve.`);
 
@@ -38,21 +41,24 @@ function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
       };
     }
 
-    static isPoint({ x: x_, y: y_ }: { x: Field | bigint; y: Field | bigint }) {
-      let x = FieldClass_.isField(x_) ? x_ : FieldClass_.from(x_);
-      let y = FieldClass_.isField(y_) ? y_ : FieldClass_.from(y_);
-
+    static isPoint({ x, y }: { x: Field; y: Field }) {
       // point of infinity; the neutral element of the group
-      if (x.equals(0n) && y.equals(0n)) return true;
+      if (x.equals(FieldClass_.zero()) && y.equals(FieldClass_.zero()))
+        return true;
 
       return y
         .square()
-        .equals(x.pow(3n).add(x.mul(EllipticCurve.a)).add(EllipticCurve.b));
+        .equals(
+          x
+            .pow(FieldClass_.from(3n))
+            .add(x.mul(EllipticCurve.a))
+            .add(EllipticCurve.b)
+        );
     }
 
     isZero() {
       let { x, y } = this.p;
-      return x.equals(0n) && y.equals(0n);
+      return x.equals(FieldClass_.zero()) && y.equals(FieldClass_.zero());
     }
 
     add(a: EllipticCurve | GroupAffine) {
@@ -62,7 +68,10 @@ function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
 
       if (this.isZero()) {
         return new EllipticCurve({ x: xq, y: yq });
-      } else if (xq.equals(0n) && yq.equals(0n)) {
+      } else if (
+        xq.equals(FieldClass_.zero()) &&
+        yq.equals(FieldClass_.zero())
+      ) {
         return new EllipticCurve(this.p);
       }
 
@@ -98,9 +107,13 @@ function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
       let a = EllipticCurve.a;
       let { x, y } = this.p;
 
-      let m = x.square().mul(3n).add(a).div(y.mul(2n));
+      let m = x
+        .square()
+        .mul(FieldClass_.from(3n))
+        .add(a)
+        .div(y.mul(FieldClass_.from(2n)));
 
-      let xr = m.square().sub(x.mul(2n));
+      let xr = m.square().sub(x.mul(FieldClass_.from(2n)));
       let yr = m.mul(x.sub(xr)).sub(y);
 
       return new EllipticCurve({
@@ -115,7 +128,7 @@ function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
     neg() {
       return new EllipticCurve({
         x: this.p.x,
-        y: this.p.y.mul(-1n),
+        y: this.p.y.mul(FieldClass_.from(-1n)),
       });
     }
 
@@ -127,7 +140,7 @@ function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
       return x.equals(xa) && y.equals(ya);
     }
 
-    static from({ x, y }: { x: bigint | Field; y: bigint | Field }) {
+    static from({ x, y }: { x: Field; y: Field }) {
       return new EllipticCurve({ x, y });
     }
 

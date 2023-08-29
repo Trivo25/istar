@@ -5,7 +5,7 @@ export {
   Lagrange,
 } from "./math/polynomial";
 
-export { Field, FieldClass, createField } from "./math/finite-field";
+export { Field, createField } from "./math/finite-field";
 
 export {
   FieldExtension,

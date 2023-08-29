@@ -7,7 +7,7 @@ import {
 } from "..";
 
 describe("Polynomial tests", () => {
-  class F extends createField(251n) {}
+  const F = createField(251n);
   let P_251 = createPolynomial(F);
 
   describe("12 + 2x + x^2", () => {
@@ -22,15 +22,15 @@ describe("Polynomial tests", () => {
     });
 
     it("should evaluate correctly", () => {
-      p.eval(2n).equals(20n % F.modulus);
+      p.eval(2n).equals(F.from(20n % F.modulus));
     });
 
     it("should evaluate correctly", () => {
-      p.eval(712n).equals(508380n % F.modulus);
+      p.eval(712n).equals(F.from(508380n % F.modulus));
     });
 
     it("should evaluate correctly", () => {
-      p.eval(0n).equals(12n % F.modulus);
+      p.eval(0n).equals(F.from(12n % F.modulus));
     });
   });
 
@@ -143,7 +143,7 @@ describe("Polynomial tests", () => {
         F.from(24n),
       ]);
 
-      expect(p.lc().equals(24n)).toBeTruthy();
+      expect(p.lc().equals(F.from(24n))).toBeTruthy();
     });
   });
 
@@ -215,19 +215,19 @@ describe("Lagrange interpolation tests", () => {
     });
 
     it("Evaluation at (2, 8)", () => {
-      expect(L.eval(2n).equals(8n)).toBeTruthy();
+      expect(L.eval(2n).equals(F.from(8n))).toBeTruthy();
     });
 
     it("Evaluation at (5, 3)", () => {
-      expect(L.eval(5n).equals(3n)).toBeTruthy();
+      expect(L.eval(5n).equals(F.from(3n))).toBeTruthy();
     });
 
     it("Evaluation at (3, 4)", () => {
-      expect(L.eval(3n).equals(4n)).toBeTruthy();
+      expect(L.eval(3n).equals(F.from(4n))).toBeTruthy();
     });
 
     it("Evaluation at L(2) = 8", () => {
-      expect(L.eval(2n).equals(8n)).toBeTruthy();
+      expect(L.eval(2n).equals(F.from(8n))).toBeTruthy();
     });
   });
 });
