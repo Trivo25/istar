@@ -7,12 +7,6 @@ type GroupAffine = {
   y: Field;
 };
 
-type GroupProjective = {
-  x: Field;
-  y: Field;
-  infinity: boolean;
-};
-
 type CurveParams = {
   a: bigint;
   b: bigint;
