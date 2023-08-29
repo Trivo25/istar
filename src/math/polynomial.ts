@@ -1,8 +1,14 @@
 import { Field, FieldClass, createField } from "./finite-field";
 
-export { createPolynomial, Polynomial, createLagrange, Lagrange };
+export {
+  createPolynomial,
+  Polynomial,
+  createLagrange,
+  Lagrange,
+  PolynomialClass,
+};
 
-function createPolynomial(FieldClass: ReturnType<typeof createField>) {
+function createPolynomial(FieldClass: FieldClass) {
   return class Polynomial {
     // x^0*a_0 + x^1*a_1 ... x^n*a_n
     coefficients: Field[];
@@ -137,6 +143,10 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
       return new Polynomial(coeffs);
     }
 
+    square() {
+      return this.mul(new Polynomial([...this.coefficients]));
+    }
+
     eval(x_: Field | bigint) {
       let x = FieldClass.isField(x_) ? x_ : FieldClass.from(x_);
       return this.coefficients.reduce((a, b, i) => {
@@ -263,8 +273,9 @@ function createLagrange(FieldClass: ReturnType<typeof createField>) {
     }
   };
 }
-
 type Polynomial = InstanceType<ReturnType<typeof createPolynomial>>;
+type PolynomialClass = ReturnType<typeof createPolynomial>;
+
 type Lagrange = InstanceType<ReturnType<typeof createLagrange>>;
 
 function removeLeadingZeros(arr: Field[]) {
