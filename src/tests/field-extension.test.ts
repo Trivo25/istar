@@ -1,6 +1,6 @@
 import { createField, extend, createPolynomial, FieldExtension } from "..";
 
-describe("", () => {
+describe("field extension", () => {
   it("", () => {
     let k = 5n;
     let F = createField(k);
@@ -37,7 +37,7 @@ describe("", () => {
     }
     console.log("---------------");
     let group: { x: string; y: string }[] = [];
-    for (let i = 0; i < points.length; i++) {
+    /*     for (let i = 0; i < points.length; i++) {
       let x = points[i];
       for (let j = 0; j < points.length; j++) {
         let y = points[j];
@@ -55,7 +55,7 @@ describe("", () => {
           });
         }
       }
-    }
+    } */
 
     console.log(group);
   });
