@@ -49,6 +49,14 @@ function createPolynomial(FieldClass: FieldClass) {
 
       let Q = new Polynomial([FieldClass.from(0n)]);
       let R = new Polynomial(this.coefficients);
+
+      if (this.isZero()) {
+        return {
+          Q,
+          R,
+        };
+      }
+
       let d = B.degree();
       let c = B.lc();
 

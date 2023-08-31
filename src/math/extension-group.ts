@@ -11,7 +11,6 @@ type CurveParams = {
   a: FieldExtension;
   b: FieldExtension;
   g: { x: FieldExtension; y: FieldExtension };
-  modulus: FieldExtension;
 };
 
 function createExtensionGroup(
@@ -50,6 +49,7 @@ function createExtensionGroup(
       if (x.equals(PolyClass.zero()) && y.equals(PolyClass.zero())) return true;
 
       let x3 = x.square().mul(x);
+
       return y
         .square()
         .equals(x3.add(x.mul(ExtensionGroup.a)).add(ExtensionGroup.b));
