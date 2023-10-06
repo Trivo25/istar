@@ -1,8 +1,7 @@
 export {
   createPolynomial,
   Polynomial,
-  createLagrange,
-  Lagrange,
+  lagrangeInterpolation,
 } from "./math/polynomial";
 
 export { Field, FieldClass, createField } from "./math/finite-field";
