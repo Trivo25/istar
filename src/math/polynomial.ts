@@ -24,6 +24,29 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
       return new Polynomial(coeffs);
     }
 
+    static fromLagrange(ps: Point[]) {
+      return ps
+        .map(({ x: xj, y: yj }, j) => {
+          let exceptXn = [...ps];
+          exceptXn.splice(j, 1);
+
+          let dividend = Polynomial.from([FieldClass.from(1n)]);
+          let divisor = Polynomial.from([FieldClass.from(1n)]);
+
+          let xPoly = Polynomial.x();
+
+          for (const p of exceptXn) {
+            dividend = dividend.mul(xPoly.sub(Polynomial.from([p.x])));
+            divisor = divisor.mul(
+              Polynomial.from([xj]).sub(Polynomial.from([p.x]))
+            );
+          }
+
+          return dividend.div(divisor).Q.mul(Polynomial.from([yj]));
+        })
+        .reduce((a, b) => a.add(b), Polynomial.from([FieldClass.from(0n)]));
+    }
+
     static x() {
       // 0 + 1x
       return new Polynomial([FieldClass.from(0n), FieldClass.from(1n)]);

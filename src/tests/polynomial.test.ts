@@ -192,6 +192,7 @@ import {
 describe("Lagrange interpolation tests", () => {
   describe("", () => {
     class F extends createField(251n) {}
+    let P_251 = createPolynomial(F);
 
     it("Evaluation at (2, 8)", () => {
       let ps = [
@@ -209,7 +210,8 @@ describe("Lagrange interpolation tests", () => {
         },
       ];
 
-      console.log(lagrangeInterpolation(ps, F.from(2n), F));
+      //console.log(lagrangeInterpolation(ps, F.from(2n), F));
+      console.log(P_251.fromLagrange(ps).eval(F.from(2n)).value);
     });
   });
 });
