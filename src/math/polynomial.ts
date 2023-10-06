@@ -24,7 +24,7 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
       return new Polynomial(coeffs);
     }
 
-    static fromLagrange(ps: Point[]) {
+    static fromLagrangePoints(ps: Point[]) {
       return ps
         .map(({ x: xj, y: yj }, j) => {
           let exceptXn = [...ps];
