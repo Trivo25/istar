@@ -181,7 +181,7 @@ function lagrangeInterpolation(
   x: InstanceType<FieldClass>,
   FieldClass: FieldClass
 ) {
-  let sum = ps
+  return ps
     .map(({ x: xn, y: yn }, n) => {
       let exceptXn = [...ps];
       exceptXn.splice(n, 1);
@@ -197,6 +197,4 @@ function lagrangeInterpolation(
       return dividend.div(divisor).mul(yn);
     })
     .reduce((a, b) => a.add(b), FieldClass.from(0n));
-
-  return sum;
 }
