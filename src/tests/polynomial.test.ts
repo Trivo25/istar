@@ -190,11 +190,11 @@ import {
 // });
 
 describe("Lagrange interpolation tests", () => {
-  describe("", () => {
-    class F extends createField(251n) {}
-    let P_251 = createPolynomial(F);
+  class F extends createField(251n) {}
+  let P_251 = createPolynomial(F);
 
-    it("Evaluation at (2, 8)", () => {
+  describe("Polynomial.fromLagrange", () => {
+    describe("Evaluation at different points", () => {
       let ps = [
         {
           x: F.from(5n),
@@ -210,8 +210,27 @@ describe("Lagrange interpolation tests", () => {
         },
       ];
 
-      //console.log(lagrangeInterpolation(ps, F.from(2n), F));
-      console.log(P_251.fromLagrange(ps).eval(F.from(2n)).value);
+      let L = P_251.fromLagrangePoints(ps);
+
+      it("Evaluation at L(2) = 8", () => {
+        expect(L.eval(F.from(2n)).value).toEqual(8n);
+      });
+
+      it("Evaluation at L(5) = 3", () => {
+        expect(L.eval(F.from(5n)).value).toEqual(3n);
+      });
+
+      it("Evaluation at L(6) = 6", () => {
+        expect(L.eval(F.from(6n)).value).toEqual(6n);
+      });
+
+      it("Evaluation at L(8) = 19", () => {
+        expect(L.eval(F.from(8n)).value).toEqual(19n);
+      });
+
+      it("Evaluation at L(9) = 29", () => {
+        expect(L.eval(F.from(9n)).value).toEqual(29n);
+      });
     });
   });
 });
