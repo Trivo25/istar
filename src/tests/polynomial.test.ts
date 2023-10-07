@@ -2,7 +2,7 @@ import { Polynomial, createField, createPolynomial } from "..";
 
 describe("Polynomial tests", () => {
   class F extends createField(251n) {}
-  let P_251 = createPolynomial(F);
+  class P_251 extends createPolynomial(F) {}
 
   describe("12 + 2x + x^2", () => {
     let p: Polynomial;

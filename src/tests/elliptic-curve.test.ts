@@ -1,12 +1,12 @@
-import { EllipticCurve, createField, createEllipticCurveGroup } from "..";
+import { createField, createEllipticCurveGroup } from "..";
 describe("Elliptic Curve (Group) tests", () => {
   describe("p=13, Group", () => {
     class F extends createField(101n) {}
-    let G = createEllipticCurveGroup(F, {
+    class G extends createEllipticCurveGroup(F, {
       a: 0n,
       b: 3n,
       g: { x: 1n, y: 2n },
-    });
+    }) {}
 
     describe("invalid group elements", () => {
       it("(2, 2)", () => {
