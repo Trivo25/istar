@@ -14,12 +14,18 @@ function createPolynomial(FieldClass: FieldClass) {
     constructor(coefficients: Field[]) {
       // remove trailing zeroes
       //if (!(coefficients.length === 1 && coefficients[0].equals(0n))) {
-      while (
-        coefficients[coefficients.length - 1] &&
-        coefficients[coefficients.length - 1].equals(0n)
-      ) {
-        coefficients.pop();
+
+      if (coefficients.every((c) => c.equals(0n))) {
+        coefficients = [FieldClass.from(0n)];
+      } else {
+        while (
+          coefficients[coefficients.length - 1] &&
+          coefficients[coefficients.length - 1].equals(0n)
+        ) {
+          coefficients.pop();
+        }
       }
+
       //}
       this.coefficients = coefficients;
     }
@@ -62,7 +68,7 @@ function createPolynomial(FieldClass: FieldClass) {
     }
 
     div(B: Polynomial) {
-      if (B.coefficients.find((c) => !c.equals(0n)) === undefined)
+      if (B.isZero())
         throw Error("Divisor polynomial cannot be the zero polynomial!");
 
       let Q = new Polynomial([FieldClass.from(0n)]);

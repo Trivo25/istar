@@ -20,6 +20,13 @@ describe("Elliptic Curve (Group) tests", () => {
           y,
         },
       }) {}
+
+      console.log(
+        Gk.from({
+          x,
+          y,
+        })
+      );
     });
   });
 });
