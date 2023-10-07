@@ -1,10 +1,4 @@
-import {
-  Lagrange,
-  Polynomial,
-  createField,
-  createLagrange,
-  createPolynomial,
-} from "..";
+import { Polynomial, createField, createPolynomial } from "..";
 
 describe("Polynomial tests", () => {
   class F extends createField(251n) {}
@@ -191,14 +185,12 @@ describe("Polynomial tests", () => {
 });
 
 describe("Lagrange interpolation tests", () => {
-  describe("", () => {
-    class F extends createField(251n) {}
-    let Lagrange = createLagrange(F);
+  class F extends createField(251n) {}
+  let P_251 = createPolynomial(F);
 
-    let L: Lagrange;
-
-    beforeAll(() => {
-      L = Lagrange.fromPoints([
+  describe("Polynomial.fromLagrange", () => {
+    describe("Evaluation at different points", () => {
+      let ps = [
         {
           x: F.from(5n),
           y: F.from(3n),
@@ -211,23 +203,29 @@ describe("Lagrange interpolation tests", () => {
           x: F.from(3n),
           y: F.from(4n),
         },
-      ]);
-    });
+      ];
 
-    it("Evaluation at (2, 8)", () => {
-      expect(L.eval(2n).equals(8n)).toBeTruthy();
-    });
+      let L = P_251.fromLagrangePoints(ps);
 
-    it("Evaluation at (5, 3)", () => {
-      expect(L.eval(5n).equals(3n)).toBeTruthy();
-    });
+      it("Evaluation at L(2) = 8", () => {
+        expect(L.eval(F.from(2n)).value).toEqual(8n);
+      });
 
-    it("Evaluation at (3, 4)", () => {
-      expect(L.eval(3n).equals(4n)).toBeTruthy();
-    });
+      it("Evaluation at L(5) = 3", () => {
+        expect(L.eval(F.from(5n)).value).toEqual(3n);
+      });
 
-    it("Evaluation at L(2) = 8", () => {
-      expect(L.eval(2n).equals(8n)).toBeTruthy();
+      it("Evaluation at L(6) = 6", () => {
+        expect(L.eval(F.from(6n)).value).toEqual(6n);
+      });
+
+      it("Evaluation at L(8) = 19", () => {
+        expect(L.eval(F.from(8n)).value).toEqual(19n);
+      });
+
+      it("Evaluation at L(9) = 29", () => {
+        expect(L.eval(F.from(9n)).value).toEqual(29n);
+      });
     });
   });
 });

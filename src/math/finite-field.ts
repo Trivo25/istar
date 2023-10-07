@@ -153,7 +153,7 @@ const createField = (p: bigint) =>
 
     inverse() {
       let x = inverse(this.value, Field.p)!;
-      //if (x === undefined) return undefined;
+      if (x === undefined) throw Error("Inverse does not exist");
       return new Field(x);
     }
 
