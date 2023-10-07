@@ -1,6 +1,6 @@
 import { Field, FieldClass } from "./finite-field";
 
-export { EllipticCurve, GroupAffine, createEllipticCurve };
+export { EllipticCurve, GroupAffine, createEllipticCurveGroup };
 
 type GroupAffine = {
   x: Field;
@@ -13,7 +13,10 @@ type CurveParams = {
   g: { x: bigint; y: bigint };
 };
 
-function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
+function createEllipticCurveGroup(
+  FieldClass_: FieldClass,
+  params: CurveParams
+) {
   return class EllipticCurve {
     // y^2 = x^3 + ax + b
     static a: Field = FieldClass_.from(params.a);
@@ -139,4 +142,4 @@ function createEllipticCurve(FieldClass_: FieldClass, params: CurveParams) {
     }
   };
 }
-type EllipticCurve = InstanceType<ReturnType<typeof createEllipticCurve>>;
+type EllipticCurve = InstanceType<ReturnType<typeof createEllipticCurveGroup>>;

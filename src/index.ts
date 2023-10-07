@@ -1,10 +1,4 @@
-export {
-  createPolynomial,
-  Polynomial,
-  createLagrange,
-  Lagrange,
-  PolynomialClass,
-} from "./math/polynomial";
+export { createPolynomial, Polynomial } from "./math/polynomial";
 
 export { Field, FieldClass, createField } from "./math/finite-field";
 
@@ -16,7 +10,7 @@ export {
 
 export {
   EllipticCurve,
-  createEllipticCurve,
+  createEllipticCurveGroup,
   GroupAffine,
 } from "./math/elliptic-curve";
 

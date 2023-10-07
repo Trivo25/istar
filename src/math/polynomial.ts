@@ -1,12 +1,6 @@
 import { Field, FieldClass, createField } from "./finite-field";
 
-export {
-  createPolynomial,
-  Polynomial,
-  createLagrange,
-  Lagrange,
-  PolynomialClass,
-};
+export { createPolynomial, Polynomial };
 
 function createPolynomial(FieldClass: FieldClass) {
   return class Polynomial {

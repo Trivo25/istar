@@ -1,7 +1,7 @@
 import {
   ExtensionGroup,
   createField,
-  createEllipticCurve,
+  createEllipticCurveGroup,
   createPolynomial,
   createExtensionGroup,
   extend,
