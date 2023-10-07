@@ -1,6 +1,6 @@
 import { Field, FieldClass, createField } from "./finite-field";
 
-export { createPolynomial, Polynomial, lagrangeInterpolation };
+export { createPolynomial, Polynomial };
 
 function createPolynomial(FieldClass: ReturnType<typeof createField>) {
   return class Polynomial {
@@ -198,26 +198,3 @@ type Point = {
   x: InstanceType<FieldClass>;
   y: InstanceType<FieldClass>;
 };
-
-function lagrangeInterpolation(
-  ps: Point[],
-  x: InstanceType<FieldClass>,
-  FieldClass: FieldClass
-) {
-  return ps
-    .map(({ x: xn, y: yn }, n) => {
-      let exceptXn = [...ps];
-      exceptXn.splice(n, 1);
-
-      let dividend = FieldClass.from(1n);
-      let divisor = FieldClass.from(1n);
-
-      for (const p of exceptXn) {
-        dividend = dividend.mul(x.sub(p.x));
-        divisor = divisor.mul(xn.sub(p.x));
-      }
-
-      return dividend.div(divisor).mul(yn);
-    })
-    .reduce((a, b) => a.add(b), FieldClass.from(0n));
-}
