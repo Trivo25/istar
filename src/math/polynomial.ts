@@ -2,7 +2,7 @@ import { Field, FieldClass, createField } from "./finite-field";
 
 export { createPolynomial, Polynomial };
 
-function createPolynomial(FieldClass: ReturnType<typeof createField>) {
+function createPolynomial(FieldClass: FieldClass) {
   return class Polynomial {
     // x^0*a_0 + x^1*a_1 ... x^n*a_n
     coefficients: Field[];
@@ -11,12 +11,14 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
     }
     constructor(coeffs: Field[]) {
       // remove trailing zeroes
+      //if (!(coeffs.length === 1 && coeffs[0].equals(0n))) {
       while (
         coeffs[coeffs.length - 1] &&
         coeffs[coeffs.length - 1].equals(0n)
       ) {
         coeffs.pop();
       }
+      //}
       this.coefficients = coeffs;
     }
 
@@ -52,12 +54,25 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
       return new Polynomial([FieldClass.from(0n), FieldClass.from(1n)]);
     }
 
+    static zero() {
+      // 0
+      return new Polynomial([FieldClass.from(0n)]);
+    }
+
     div(B: Polynomial) {
       if (B.coefficients.find((c) => !c.equals(0n)) === undefined)
         throw Error("Divisor polynomial cannot be the zero polynomial!");
 
       let Q = new Polynomial([FieldClass.from(0n)]);
       let R = new Polynomial(this.coefficients);
+
+      if (this.isZero()) {
+        return {
+          Q,
+          R,
+        };
+      }
+
       let d = B.degree();
       let c = B.lc();
 
@@ -74,7 +89,8 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
         let sb = S.mul(B);
         R = R.sub(sb);
       }
-
+      // setting R to the zero polynomial 0
+      R = R.coefficients.length === 0 ? Polynomial.zero() : R;
       if (!Q.mul(B).add(R).equals(this)) throw Error("Something went wrong");
 
       return {
@@ -104,6 +120,9 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
     }
 
     add(p: Polynomial) {
+      if (this.isZero()) return p;
+      if (p.isZero()) return this;
+
       let a, b;
       if (p.coefficients.length >= this.coefficients.length) {
         a = p.coefficients;
@@ -126,6 +145,10 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
       return new Polynomial(coeffs);
     }
 
+    isZero() {
+      return this.coefficients.length === 1 && this.coefficients[0].equals(0n);
+    }
+
     sub(p: Polynomial) {
       let a = p.coefficients;
       let b = this.coefficients;
@@ -142,6 +165,10 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
       }
 
       return new Polynomial(coeffs);
+    }
+
+    square() {
+      return this.mul(new Polynomial([...this.coefficients]));
     }
 
     eval(x_: Field | bigint) {
@@ -182,7 +209,7 @@ function createPolynomial(FieldClass: ReturnType<typeof createField>) {
       let n = this.degree() + 1;
       for (let i = 0; i < n; i++) {
         let c = this.coefficients[i];
-        if (c.equals(0n)) continue;
+        if (c.equals(0n) && this.coefficients.length !== 1) continue;
         s += c.toString();
         if (i != 0) s += "x^" + i;
         if (i != n - 1) s += " + ";

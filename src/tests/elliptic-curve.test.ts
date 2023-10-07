@@ -1,8 +1,8 @@
-import { EllipticCurve, createField, createEllipticCurve } from "..";
+import { EllipticCurve, createField, createEllipticCurveGroup } from "..";
 describe("Elliptic Curve (Group) tests", () => {
   describe("p=13, Group", () => {
     class F extends createField(101n) {}
-    let G = createEllipticCurve(F, {
+    let G = createEllipticCurveGroup(F, {
       a: 0n,
       b: 3n,
       g: { x: 1n, y: 2n },
