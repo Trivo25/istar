@@ -6,24 +6,26 @@ function createPolynomial(FieldClass: FieldClass) {
   return class Polynomial {
     // x^0*a_0 + x^1*a_1 ... x^n*a_n
     coefficients: Field[];
-    static get field() {
+
+    static get FieldClass() {
       return FieldClass;
     }
-    constructor(coeffs: Field[]) {
+
+    constructor(coefficients: Field[]) {
       // remove trailing zeroes
-      //if (!(coeffs.length === 1 && coeffs[0].equals(0n))) {
+      //if (!(coefficients.length === 1 && coefficients[0].equals(0n))) {
       while (
-        coeffs[coeffs.length - 1] &&
-        coeffs[coeffs.length - 1].equals(0n)
+        coefficients[coefficients.length - 1] &&
+        coefficients[coefficients.length - 1].equals(0n)
       ) {
-        coeffs.pop();
+        coefficients.pop();
       }
       //}
-      this.coefficients = coeffs;
+      this.coefficients = coefficients;
     }
 
-    static from(coeffs: Field[]) {
-      return new Polynomial(coeffs);
+    static from(coefficients: Field[]) {
+      return new Polynomial(coefficients);
     }
 
     static fromLagrangePoints(ps: Point[]) {
@@ -89,6 +91,7 @@ function createPolynomial(FieldClass: FieldClass) {
         let sb = S.mul(B);
         R = R.sub(sb);
       }
+
       // setting R to the zero polynomial 0
       R = R.coefficients.length === 0 ? Polynomial.zero() : R;
       if (!Q.mul(B).add(R).equals(this)) throw Error("Something went wrong");
@@ -119,75 +122,76 @@ function createPolynomial(FieldClass: FieldClass) {
       return new Polynomial(prod);
     }
 
-    add(p: Polynomial) {
-      if (this.isZero()) return p;
-      if (p.isZero()) return this;
+    add(P: Polynomial) {
+      if (this.isZero()) return P;
+      if (P.isZero()) return this;
 
-      let a, b;
-      if (p.coefficients.length >= this.coefficients.length) {
-        a = p.coefficients;
-        b = this.coefficients;
+      let xs: Field[] = [];
+      let ys: Field[] = [];
+      if (P.coefficients.length >= this.coefficients.length) {
+        xs = P.coefficients;
+        ys = this.coefficients;
       } else {
-        b = p.coefficients;
-        a = this.coefficients;
+        ys = P.coefficients;
+        xs = this.coefficients;
       }
 
-      let coeffs = [];
-      for (let i = 0; i < a.length; i++) {
-        let c = b.at(i);
+      let coefficients = [];
+      for (let i = 0; i < xs.length; i++) {
+        let c = ys.at(i);
         if (c) {
-          coeffs.push(a[i].add(c));
+          coefficients.push(xs[i].add(c));
         } else {
-          coeffs.push(a[i]);
+          coefficients.push(xs[i]);
         }
       }
 
-      return new Polynomial(coeffs);
+      return new Polynomial(coefficients);
     }
 
     isZero() {
       return this.coefficients.length === 1 && this.coefficients[0].equals(0n);
     }
 
-    sub(p: Polynomial) {
-      let a = p.coefficients;
-      let b = this.coefficients;
+    sub(P: Polynomial) {
+      let xs = P.coefficients;
+      let ys = this.coefficients;
 
-      if (a.length >= b.length) {
-        b = b.concat(Array(a.length - b.length).fill(FieldClass.from(0n)));
+      if (xs.length >= ys.length) {
+        ys = ys.concat(Array(xs.length - ys.length).fill(FieldClass.from(0n)));
       } else {
-        a = a.concat(Array(b.length - a.length).fill(FieldClass.from(0n)));
+        xs = xs.concat(Array(ys.length - xs.length).fill(FieldClass.from(0n)));
       }
 
-      let coeffs = [];
-      for (let i = 0; i < Math.max(a.length, b.length); i++) {
-        coeffs.push(b[i].sub(a.at(i) ?? FieldClass.from(0n)));
+      let coefficients = [];
+      for (let i = 0; i < Math.max(xs.length, ys.length); i++) {
+        coefficients.push(ys[i].sub(xs.at(i) ?? FieldClass.from(0n)));
       }
 
-      return new Polynomial(coeffs);
+      return new Polynomial(coefficients);
     }
 
     square() {
       return this.mul(new Polynomial([...this.coefficients]));
     }
 
-    eval(x_: Field | bigint) {
-      let x = FieldClass.isField(x_) ? x_ : FieldClass.from(x_);
+    eval(x: Field | bigint) {
+      let x_ = FieldClass.isField(x) ? x : FieldClass.from(x);
       return this.coefficients.reduce((a, b, i) => {
-        let xi = x.pow(BigInt(i));
+        let xi = x_.pow(BigInt(i));
         let bxi = xi.mul(b);
         return bxi.add(a);
       }, FieldClass.from(0n));
     }
 
-    equals(p: Polynomial) {
+    equals(P: Polynomial) {
       let thisLength = this.coefficients.length;
-      let pLength = p.coefficients.length;
+      let pLength = P.coefficients.length;
 
       if (pLength !== thisLength) return false;
 
       for (let i = 0; i < thisLength; i++) {
-        if (!this.coefficients[i].equals(p.coefficients[i])) return false;
+        if (!this.coefficients[i].equals(P.coefficients[i])) return false;
       }
       return true;
     }
