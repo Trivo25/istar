@@ -27,10 +27,10 @@ function createEllipticCurveGroup(
 
     p: GroupAffine;
 
-    constructor({ x: x_, y: y_ }: { x: Field | bigint; y: Field | bigint }) {
+    constructor({ x, y }: { x: Field | bigint; y: Field | bigint }) {
       // y^2 = x^3 + ax + b
-      let x = FieldClass_.isField(x_) ? x_ : FieldClass_.from(x_);
-      let y = FieldClass_.isField(y_) ? y_ : FieldClass_.from(y_);
+      x = FieldClass_.isField(x) ? x : FieldClass_.from(x);
+      y = FieldClass_.isField(y) ? y : FieldClass_.from(y);
 
       if (!EllipticCurve.isPoint({ x, y }))
         throw new Error(`(${x}, ${y}) is not a valid point on this curve.`);
@@ -41,9 +41,9 @@ function createEllipticCurveGroup(
       };
     }
 
-    static isPoint({ x: x_, y: y_ }: { x: Field | bigint; y: Field | bigint }) {
-      let x = FieldClass_.isField(x_) ? x_ : FieldClass_.from(x_);
-      let y = FieldClass_.isField(y_) ? y_ : FieldClass_.from(y_);
+    static isPoint({ x, y }: { x: Field | bigint; y: Field | bigint }) {
+      x = FieldClass_.isField(x) ? x : FieldClass_.from(x);
+      y = FieldClass_.isField(y) ? y : FieldClass_.from(y);
 
       // point of infinity; the neutral element of the group
       if (x.equals(0n) && y.equals(0n)) return true;
