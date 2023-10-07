@@ -1,4 +1,4 @@
-import { Groth16, createField, createLagrange } from "..";
+import { Groth16, createField } from "..";
 
 describe("Groth16 tests", () => {
   it("test", () => {

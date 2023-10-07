@@ -1,9 +1,4 @@
-import {
-  Polynomial,
-  createField,
-  createPolynomial,
-  lagrangeInterpolation,
-} from "..";
+import { Polynomial, createField, createPolynomial } from "..";
 
 describe("Polynomial tests", () => {
   class F extends createField(251n) {}
