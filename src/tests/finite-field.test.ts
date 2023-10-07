@@ -14,6 +14,10 @@ describe("FiniteField tests", () => {
         expect(F_251.from(0n).add(0n).toBigint()).toEqual(0n);
       });
 
+      it("5 + 251 = 5", () => {
+        expect(F_251.from(5n).add(251n).toBigint()).toEqual(5n);
+      });
+
       it("-p + p = 0", () => {
         expect(
           F_251.from(F_251.modulus * -1n)

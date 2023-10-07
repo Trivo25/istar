@@ -9,7 +9,7 @@ describe("field extension", () => {
 
     let ir = P.from([F.from(2n), F.from(0n), F.from(1n)]);
 
-    let Fextended = extend(F, ir.coefficients, 2n);
+    class Fextended extends extend(F, ir.coefficients, 2n) {}
 
     //all elements of F_k^2
     // let temp: string[] = [];
