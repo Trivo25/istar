@@ -11,15 +11,14 @@ function createPolynomial(FieldClass: FieldClass) {
     }
     constructor(coeffs: Field[]) {
       // remove trailing zeroes
-      if (!(coeffs.length === 1 && coeffs[0].equals(0n))) {
-        while (
-          coeffs[coeffs.length - 1] &&
-          coeffs[coeffs.length - 1].equals(0n)
-        ) {
-          coeffs.pop();
-        }
+      //if (!(coeffs.length === 1 && coeffs[0].equals(0n))) {
+      while (
+        coeffs[coeffs.length - 1] &&
+        coeffs[coeffs.length - 1].equals(0n)
+      ) {
+        coeffs.pop();
       }
-
+      //}
       this.coefficients = coeffs;
     }
 
