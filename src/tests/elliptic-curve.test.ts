@@ -173,4 +173,44 @@ describe("Elliptic Curve (Group) tests", () => {
       });
     });
   });
+  describe("bn254, Group", () => {
+    class F extends createField(
+      21888242871839275222246405745257275088696311157297823662689037894645226208583n
+    ) {}
+    class G extends createEllipticCurveGroup(F, {
+      a: 0n,
+      b: 3n,
+      g: { x: 1n, y: 2n },
+    }) {}
+
+    describe("invalid group elements", () => {
+      it("(2, 2)", () => {
+        expect(() => {
+          G.from({ y: 2n, x: 2n });
+        }).toThrow(Error);
+      });
+
+      it("(5, 5)", () => {
+        expect(() => {
+          G.from({ y: 5n, x: 5n });
+        }).toThrow(Error);
+      });
+
+      it("(2, 6)", () => {
+        expect(() => {
+          G.from({ y: 2n, x: 6n });
+        }).toThrow(Error);
+      });
+    });
+
+    describe("valid group elements construction", () => {
+      it("g", () => {
+        expect(() => G.g).not.toThrow(Error);
+      });
+
+      it("infinity", () => {
+        expect(() => G.from({ x: 0n, y: 0n })).not.toThrow(Error);
+      });
+    });
+  });
 });
