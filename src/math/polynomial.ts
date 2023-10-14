@@ -15,9 +15,15 @@ function createPolynomial(FieldClass: FieldClass) {
       // remove trailing zeroes
       //if (!(coefficients.length === 1 && coefficients[0].equals(0n))) {
 
-      if (coefficients.every((c) => c.equals(0n))) {
+      // if all coefficients are 0, then the polynomial is 0 [0]
+      // if the array is empty, then the polynomial is 0 [0]
+      if (
+        coefficients.every((c) => c.equals(0n)) ||
+        coefficients.length === 0
+      ) {
         coefficients = [FieldClass.from(0n)];
       } else {
+        // crop the array to remove padded zeroes
         while (
           coefficients[coefficients.length - 1] &&
           coefficients[coefficients.length - 1].equals(0n)
@@ -85,6 +91,8 @@ function createPolynomial(FieldClass: FieldClass) {
       let c = B.lc();
 
       while (R.degree() >= d) {
+        if (R.isZero()) break;
+
         let n = R.degree() - d;
         let e = R.lc().div(c);
         let S_coefficients = new Array<Field>(n + 1).fill(FieldClass.from(0n));
@@ -98,8 +106,6 @@ function createPolynomial(FieldClass: FieldClass) {
         R = R.sub(sb);
       }
 
-      // setting R to the zero polynomial 0
-      R = R.coefficients.length === 0 ? Polynomial.zero() : R;
       if (!Q.mul(B).add(R).equals(this)) throw Error("Something went wrong");
 
       return {
