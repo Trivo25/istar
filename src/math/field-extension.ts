@@ -16,8 +16,8 @@ const extend = (
     constructor(coeffs: Field[]) {
       if (coeffs.length > m)
         throw Error("Degree of the polynomial needs to be less than 2");
-      super(coeffs);
 
+      super(coeffs);
       if (!coeffs.every((i) => i.equals(0n))) {
         this.coefficients = super.div(this.modulus).R.coefficients;
       }

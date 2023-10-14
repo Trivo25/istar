@@ -1,62 +1,48 @@
-import { createField, extend, createPolynomial, FieldExtension } from "..";
+import { createField, extend, FieldExtension } from "..";
 
 describe("field extension", () => {
-  it("", () => {
-    let k = 5n;
-    let F = createField(k);
+  describe("small, Fk_5^2", () => {
+    const k = 5n;
+    const n = 2n;
+    class F extends createField(k) {}
+    class Fk extends extend(F, [F.from(2n), F.from(0n), F.from(1n)], 2n) {}
 
-    let P = createPolynomial(F);
+    let xs: FieldExtension[] = [];
 
-    let ir = P.from([F.from(2n), F.from(0n), F.from(1n)]);
+    it("generates all elements in Fk_k^n", () => {
+      // all elements of Fk_5^2
+      for (let i = 0n; i < k ** n; i++) {
+        for (let j = 0n; j < k ** n; j++) {
+          let q = Fk.from([F.from(i), F.from(j)]);
 
-    class Fextended extends extend(F, ir.coefficients, 2n) {}
-
-    //all elements of F_k^2
-    // let temp: string[] = [];
-    // for (let i = 0n; i < k ** 2n; i++) {
-    //   for (let j = 0n; j < k ** 2n; j++) {
-    //     let q = Fextended.from([F.from(i), F.from(j)]);
-
-    //     let s = q.toPretty();
-    //     if (temp.find((e) => e == s) === undefined) {
-    //       temp.push(s);
-    //     }
-    //   }
-    // }
-    // console.log(temp);
-
-    let points: FieldExtension[] = [];
-    for (let i = 0n; i < k ** 2n; i++) {
-      for (let j = 0n; j < k ** 2n; j++) {
-        let q = Fextended.from([F.from(i), F.from(j)]);
-
-        if (points.find((e) => e.equals(q)) === undefined) {
-          points.push(q);
+          if (xs.find((e) => e.equals(q)) === undefined) {
+            xs.push(q);
+          }
         }
       }
-    }
-    console.log("---------------");
-    let group: { x: string; y: string }[] = [];
-    /*     for (let i = 0; i < points.length; i++) {
-      let x = points[i];
-      for (let j = 0; j < points.length; j++) {
-        let y = points[j];
 
-        let x3 = x.mul(x).mul(x);
-        let x3x = x3.add(x);
-        let x3xa = x3x.add(Fextended.from([F.from(1n)]));
+      expect(xs.length).toEqual(Number(k ** n));
+    });
 
-        let y2 = y.mul(y);
+    it("additive identity", () => {
+      let e = Fk.from([F.from(0n)]);
+      xs.forEach((a) => {
+        expect(a.add(e).equals(a)).toEqual(true);
+      });
+    });
 
-        if (x3xa.equals(y2)) {
-          group.push({
-            x: x.toPretty(),
-            y: y.toPretty(),
-          });
-        }
-      }
-    } */
+    it("subtractive identity", () => {
+      let e = Fk.from([F.from(0n)]);
+      xs.forEach((a) => {
+        expect(a.sub(e).equals(a)).toEqual(true);
+      });
+    });
 
-    console.log(group);
+    it("multiplicative identity", () => {
+      let e = Fk.from([F.from(1n)]);
+      xs.forEach((a) => {
+        expect(a.mul(e).equals(a)).toEqual(true);
+      });
+    });
   });
 });

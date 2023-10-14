@@ -14,12 +14,24 @@ function createPolynomial(FieldClass: FieldClass) {
     constructor(coefficients: Field[]) {
       // remove trailing zeroes
       //if (!(coefficients.length === 1 && coefficients[0].equals(0n))) {
-      while (
-        coefficients[coefficients.length - 1] &&
-        coefficients[coefficients.length - 1].equals(0n)
+
+      // if all coefficients are 0, then the polynomial is 0 [0]
+      // if the array is empty, then the polynomial is 0 [0]
+      if (
+        coefficients.every((c) => c.equals(0n)) ||
+        coefficients.length === 0
       ) {
-        coefficients.pop();
+        coefficients = [FieldClass.from(0n)];
+      } else {
+        // crop the array to remove padded zeroes
+        while (
+          coefficients[coefficients.length - 1] &&
+          coefficients[coefficients.length - 1].equals(0n)
+        ) {
+          coefficients.pop();
+        }
       }
+
       //}
       this.coefficients = coefficients;
     }
@@ -62,7 +74,7 @@ function createPolynomial(FieldClass: FieldClass) {
     }
 
     div(B: Polynomial) {
-      if (B.coefficients.find((c) => !c.equals(0n)) === undefined)
+      if (B.isZero())
         throw Error("Divisor polynomial cannot be the zero polynomial!");
 
       let Q = new Polynomial([FieldClass.from(0n)]);
@@ -79,6 +91,8 @@ function createPolynomial(FieldClass: FieldClass) {
       let c = B.lc();
 
       while (R.degree() >= d) {
+        if (R.isZero()) break;
+
         let n = R.degree() - d;
         let e = R.lc().div(c);
         let S_coefficients = new Array<Field>(n + 1).fill(FieldClass.from(0n));
@@ -92,8 +106,6 @@ function createPolynomial(FieldClass: FieldClass) {
         R = R.sub(sb);
       }
 
-      // setting R to the zero polynomial 0
-      R = R.coefficients.length === 0 ? Polynomial.zero() : R;
       if (!Q.mul(B).add(R).equals(this)) throw Error("Something went wrong");
 
       return {

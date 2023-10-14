@@ -33,10 +33,11 @@ function createExtensionGroup(
 
     constructor({ x, y }: { x: FieldExtension; y: FieldExtension }) {
       // y^2 = x^3 + ax + b
-      if (!ExtensionGroup.isPoint({ x, y }))
+      if (!ExtensionGroup.isPoint({ x, y })) {
         throw new Error(
           `(${x.toPretty()}, ${y.toPretty()}) is not a valid point on this curve.`
         );
+      }
 
       this.p = {
         x,
@@ -49,10 +50,8 @@ function createExtensionGroup(
       if (x.equals(PolyClass.zero()) && y.equals(PolyClass.zero())) return true;
 
       let x3 = x.square().mul(x);
-
-      return y
-        .square()
-        .equals(x3.add(x.mul(ExtensionGroup.a)).add(ExtensionGroup.b));
+      let y2 = y.square();
+      return y2.equals(x3.add(x.mul(ExtensionGroup.a)).add(ExtensionGroup.b));
     }
 
     isZero() {
@@ -104,12 +103,11 @@ function createExtensionGroup(
       let { x, y } = this.p;
 
       let p2 = PolyClass.from([FieldClass_.from(2n)]);
-
       let m = x
         .square()
         .mul(PolyClass.from([FieldClass_.from(3n)]))
         .add(a)
-        .div(y.mul(p2)).R;
+        .div(y.mul(p2)).Q;
 
       let xr = m.square().sub(x.mul(p2));
       let yr = m.mul(x.sub(xr)).sub(y);
@@ -147,6 +145,10 @@ function createExtensionGroup(
         x: a instanceof ExtensionGroup ? a.p.x : a.x,
         y: a instanceof ExtensionGroup ? a.p.y : a.y,
       };
+    }
+
+    toPretty() {
+      return `{x: ${this.p.x.toPretty()}, y: ${this.p.y.toPretty()}}`;
     }
   };
 }
