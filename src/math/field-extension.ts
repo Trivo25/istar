@@ -18,7 +18,6 @@ const extend = (
         throw Error("Degree of the polynomial needs to be less than 2");
 
       super(coeffs);
-
       if (!coeffs.every((i) => i.equals(0n))) {
         this.coefficients = super.div(this.modulus).R.coefficients;
       }
